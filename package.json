@@ -1,0 +1,30 @@
+{
+  "name": "@solana/solarweave",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/TheLoneRonin/SolarweaveBridge.git",
+  "author": "The Lone Ronin",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "npm run build && node dist/Solarweave.js",
+    "build": "tsc --outDir dist",
+    "test": "npm run build && mocha dist/test"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^0.71.1",
+    "arweave-deploy": "^1.9.1",
+    "body-parser": "^1.19.0",
+    "commander": "^6.0.0",
+    "express": "^4.17.1",
+    "mocha": "^8.1.1",
+    "superagent": "^6.0.0",
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/mocha": "^8.0.2",
+    "@types/node": "^14.0.27",
+    "@types/superagent": "^4.1.9"
+  }
+}
