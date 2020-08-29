@@ -1,38 +1,56 @@
+import 'colors';
 import { Command } from 'commander';
+import { ProcessCommand } from './util/Command.util';
+
+import { Balance } from './command/Balance.command';
+import { LatestBlock } from './command/Latest.command';
+import { Livestream } from './command/Livestream.command';
+import { Cache } from './command/Cache.command';
 
 export const Solarweave = new Command('Solarweave Bridge');
 
-export function Start() {
-    Solarweave
-        .option('-c, --credentials [file path]', 'specify the path to the json file containing your Arweave credentials');
+Solarweave
+    .option('--database [name]', 'the name of the database (for Arweave ArQL tags)', 'solarweave-devnet')
+    .option('--url [RPC URL]', 'the Solana RPC URL to query blocks from', 'https://devnet.solana.com')
+    .option('--credentials [file path]', 'specify the path to the json file containing your Arweave credentials', '.arweave.creds.json')
+    .option('--local', 'cache locally to a JSON file instead of to Arweave', false)
+    .option('--localFile [file path]', 'if caching data locally, specify the file path', 'solarweave.cache.json')
+    .option('--console', 'do not output log data to console', false)
+    .option('--uncompressed', 'store blocks in an uncompressed format', false)
+    .option('--parallelize [blocks]', 'the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time', '1')
+    .option('--benchmark', 'benchmark Solarweave and start tracking size and speed stats stored in benchmark.json', false)
+    .option('--noverify', 'if caching to Arweave do not double check if the block was already submitted', false);
 
-    Solarweave
-        .command('livestream')
-        .description('livestream blocks directly to your arweave database')
-        .action(() => {
-            console.log('Livestream');
-        });
+Solarweave
+    .command('balance')
+    .description('retrieve the public address and balance of your Arweave wallet')
+    .action(async () => {
+        ProcessCommand(Solarweave);
+        Balance();
+    });
 
-    Solarweave
-        .command('cache')
-        .description('cache blocks to your arweave database')
-        .option('--all', 'start caching all blocks')
-        .option('--block <number>', 'specify the block number you want to cache')
-        .option('--start <number>', 'specify the starting block number')
-        .option('--end <number>', 'specify the ending block number')
-        .action(() => {
-            console.log('Cache');
-        });
+Solarweave
+    .command('latest')
+    .description('retrieve the latest block and output the block to console')
+    .action(() => {
+        ProcessCommand(Solarweave);
+        LatestBlock();
+    });
 
-    Solarweave
-        .command('retrieve')
-        .description('retrieve blocks from your arweave database')
-        .option('--block <number>', 'specify the block number you want to retrieve')
-        .option('--start <number>', 'specify the starting block number')
-        .option('--end <number>', 'specify the ending block number')
-        .action(() => {
-            console.log('Retrieve');
-        });
+Solarweave
+    .command('livestream')
+    .description('livestream blocks directly to your arweave database (or locally)')
+    .action(() => {
+        ProcessCommand(Solarweave);
+        Livestream();
+    });
 
-    Solarweave.parse(process.argv);
-}
+Solarweave
+    .command('cache')
+    .description('retrieve all the blocks that are still available and store them in Arweave')
+    .action(() => {
+        ProcessCommand(Solarweave);
+        Cache();
+    });
+
+Solarweave.parse(process.argv);
