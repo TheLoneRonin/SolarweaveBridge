@@ -1,0 +1,9 @@
+{
+  "epoch": 1600209059897,
+  "actions": [
+    {
+      "action": "get_latest_block",
+      "epoch": 1600209060730
+    }
+  ]
+}

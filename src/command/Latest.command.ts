@@ -1,4 +1,5 @@
 import { Log } from '../util/Log.util';
+import { LogBenchmark } from '../util/Benchmark.util';
 import { GetLatestBlock } from '../service/Solana.scanner.service';
 
 export async function LatestBlock() {
@@ -11,4 +12,6 @@ export async function LatestBlock() {
     
     Log(`Block Data`);
     Log(JSON.stringify(Block, null, 2));
+
+    LogBenchmark('get_latest_block');
 }

@@ -7,6 +7,11 @@ import { LatestBlock } from './command/Latest.command';
 import { Livestream } from './command/Livestream.command';
 import { Cache } from './command/Cache.command';
 
+export const Benchmark = {
+    epoch: Number(new Date()),
+    actions: [],
+};
+
 export const Solarweave = new Command('Solarweave Bridge');
 
 Solarweave

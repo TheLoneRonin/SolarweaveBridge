@@ -2,12 +2,13 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Build Status](https://travis-ci.org/TheLoneRonin/SolarweaveBridge.svg?branch=master)](https://travis-ci.org/TheLoneRonin/SolarweaveBridge)
+[![codecov](https://codecov.io/gh/TheLoneRonin/SolarweaveBridge/branch/master/graph/badge.svg)](https://codecov.io/gh/TheLoneRonin/SolarweaveBridge)
 
 An easy, simple and effective way to store Solana Blocks into Arweave via command line. Solarweave's core objective is to make it as easy as possible to navigate, store and analyze blocks from Solana.
 
 Solarweave uses extensive tag annotations in order to make it as easy as possible to navigate the database via `ArQL`. Check the **ArQL** section to learn more.
 
-**For production use case notes related to the Gitcoin Contest, please review the [NOTES](./NOTES.md) markdown file**
+If you want to review the benchmarks for Solarweave, check out the [Benchmarks](./BENCHMARKS.md) file!
 
 ----
 

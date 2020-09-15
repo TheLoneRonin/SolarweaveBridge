@@ -107,6 +107,7 @@ dist
 solarweave.cache.json
 .arweave.creds.json
 .solarweave.temp
+coverage.json
 
 validator.pair.json
 vote.pair.json

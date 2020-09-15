@@ -8,7 +8,11 @@
   "scripts": {
     "start": "npm run build && node dist/src/Solarweave.js",
     "build": "tsc --outDir dist",
-    "test": "npm run build && mocha dist/test --timeout 10000"
+    "benchmarks": "npm run build && node dist/src/Benchmarks.js",
+    "compression-benchmarks": "npm run build && node dist/src/CompressionAnalysis.js",
+    "test": "npm run build && nyc mocha dist/test --timeout 10000",
+    "test-report": "nyc report --reporter=json > coverage/coverage.json",
+    "codecov": "nyc report --reporter=text-lcov | codecov --pipe --token=d66120aa-e349-4033-8e71-f07a2262ffd1"
   },
   "dependencies": {
     "arql-ops": "^1.0.0",
@@ -24,7 +28,9 @@
     "@types/mocha": "^8.0.2",
     "@types/node": "^14.0.27",
     "@types/superagent": "^4.1.9",
+    "codecov": "^3.7.2",
     "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
     "typescript": "^3.9.7"
   }
 }

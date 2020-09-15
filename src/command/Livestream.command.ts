@@ -37,11 +37,11 @@ export async function StreamBlocks(slot: number) {
             for (let i = 0; i < Slots.length; i += SolarweaveConfig.parallelize) {
                 const PromisedBlocks = [];
                 
-                for (let j = 0; j < SolarweaveConfig.parallelize && j < Slots.length; j++) {
-                    PromisedBlocks.push(CacheBlock(Slots[j]));
+                for (let j = 0; j < SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
+                    PromisedBlocks.push(CacheBlock(Slots[i + j]));
                 }
 
-                await Promise.all(PromisedBlocks)
+                await Promise.all(PromisedBlocks);
                 
                 lastSlot = Slots[i];
                 write(`.solarweave.temp`, (lastSlot).toString());

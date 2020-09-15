@@ -1,7 +1,8 @@
 
-import { remove, read, write } from 'fs-jetpack';
+import { read, write } from 'fs-jetpack';
 import { SolarweaveConfig } from '../Config';
 import { Log } from '../util/Log.util';
+import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { SubmitBlockToArweave, RetrieveBlockByBlockhash } from '../service/Arweave.service';
 import { GetSlot, GetBlock } from './Solana.rpc.service';
@@ -16,7 +17,7 @@ export async function GetLatestBlock() {
     return block;
 }
 
-export async function AddBlockToCache(Block, Slot: number): Promise<Error> {
+export async function AddBlockToCache(Block, Slot: number): Promise<string> {
     try {
         if (SolarweaveConfig.local) {
             const File = read(SolarweaveConfig.localFile);
@@ -24,7 +25,7 @@ export async function AddBlockToCache(Block, Slot: number): Promise<Error> {
     
             if (SolarweaveConfig.verify) {
                 if (Data.filter(block => block.blockhash === Block.blockhash).length > 0) {
-                    return new Error(`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
+                    return (`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
                 }
             }
             
@@ -36,7 +37,7 @@ export async function AddBlockToCache(Block, Slot: number): Promise<Error> {
         } else {
             if (SolarweaveConfig.verify) {
                 if (await RetrieveBlockByBlockhash(Block.blockhash)) {
-                    return new Error(`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
+                    return (`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
                 }
             }
 
@@ -70,10 +71,12 @@ export async function AddBlockToCache(Block, Slot: number): Promise<Error> {
 
             await SubmitBlockToArweave(transaction);
         }
+
+        LogBenchmark('cache_block');
         
         return null;
     } catch (error) {
-        return new Error(error);
+        return (error.message);
     }
 }
 
@@ -82,7 +85,7 @@ export async function CacheBlock(Slot) {
     const Block = blockPayload.body.result;
 
     if (Block.blockhash) {
-        const Error: Error = await AddBlockToCache(Block, Slot);
+        const Error: string = await AddBlockToCache(Block, Slot);
         if (Error) { Log(Error) }
     } else {
         Log(`Solarweave is now in sync with the latest block`.yellow);
