@@ -8,4 +8,3 @@ before_script:
 
 script:
   - yarn start help
-# - yarn test

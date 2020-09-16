@@ -16,16 +16,14 @@ If you want to review the benchmarks for Solarweave, check out the [Benchmarks](
 
 First install `solarweave` via `npm` or `yarn`
 
-**Note that this package is not on the public npm registry and you'll have to use `npm link` or run commands from the git repository.**
-
 ```bash
-npm install solarweave --global
+npm install @theronin/solarweave --global
 ```
 
 *or*
 
 ```bash
-yarn global add solarweave
+yarn global add @theronin/solarweave
 ```
 
 You should be then able to run the `solarweave` help command which will output the following:

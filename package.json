@@ -1,10 +1,11 @@
 {
-  "name": "@solana/solarweave",
+  "name": "@theronin/solarweave",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/src/Solarweave.js",
   "repository": "https://github.com/TheLoneRonin/SolarweaveBridge.git",
   "license": "MIT",
   "private": false,
+  "preferGlobal": true,
   "scripts": {
     "start": "npm run build && node dist/src/Solarweave.js",
     "build": "tsc --outDir dist",
@@ -13,6 +14,9 @@
     "test": "npm run build && nyc mocha dist/test --timeout 10000",
     "test-report": "nyc report --reporter=json > coverage/coverage.json",
     "codecov": "nyc report --reporter=text-lcov | codecov --pipe --token=d66120aa-e349-4033-8e71-f07a2262ffd1"
+  },
+  "bin": {
+    "solarweave": "dist/src/Solarweave.js"
   },
   "dependencies": {
     "arql-ops": "^1.0.0",
