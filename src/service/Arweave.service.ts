@@ -1,10 +1,9 @@
 import { read } from 'fs-jetpack';
-import { and, equals } from 'arql-ops';
 
 import { SolarweaveConfig, arweave } from '../Config';
-import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { Log } from '../util/Log.util';
-import { CompressBlock, DecompressBlock } from '../service/Compression.service';
+import { ArweaveTransaction } from '../interface/Arweave.interface';
+import { CompressBlock } from '../service/Compression.service';
 
 export async function LoadWallet() {
     const key = JSON.parse(read(SolarweaveConfig.credentials));
@@ -53,8 +52,7 @@ export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
         }
     } 
 
-    tx = await CreateBlockIndices(key, tx, transaction);
-
+    await CreateBlockIndices(key, transaction);
     await arweave.transactions.sign(tx, key);
     await arweave.transactions.post(tx);
 
@@ -64,7 +62,7 @@ export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
     return true;
 }
 
-export async function CreateBlockIndices(key, tx, transaction: ArweaveTransaction) {
+export async function CreateBlockIndices(key, transaction: ArweaveTransaction) {
     const blockhash = transaction.tags.blockhash;
     const signatures = [];
     const accountKeys = [];
@@ -85,75 +83,36 @@ export async function CreateBlockIndices(key, tx, transaction: ArweaveTransactio
         }
     }
 
+    let defaultSignature = '';
+
+    if (signatures.length > 0) {
+        defaultSignature = signatures[0];
+    }    
+
     for (let i = 0; i < signatures.length; i++) {
+        const tx = await arweave.createTransaction({ data: blockhash }, key);
+
         tx.addTag('database', `${transaction.tags.database}-index`);
         tx.addTag('signature', signatures[i]);
+        tx.addTag('parentSlot', transaction.tags.parentSlot);
+        tx.addTag('slot', transaction.tags.slot);
+        tx.addTag('blockhash', transaction.tags.blockhash);
+
+        await arweave.transactions.sign(tx, key);
+        await arweave.transactions.post(tx);
     }
 
     for (let i = 0; i < accountKeys.length; i++) {
+        const tx = await arweave.createTransaction({ data: blockhash }, key);
+
         tx.addTag('database', `${transaction.tags.database}-index`);
         tx.addTag('accountKey', accountKeys[i]);
-    }
+        tx.addTag('defaultSignature', defaultSignature);
+        tx.addTag('parentSlot', transaction.tags.parentSlot);
+        tx.addTag('slot', transaction.tags.slot);
+        tx.addTag('blockhash', transaction.tags.blockhash);
 
-    return tx;
-}
-
-export async function RetrieveBlockBySlot(slot: number) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', SolarweaveConfig.database),
-            equals('slot', slot.toString()),
-        ),
-    );
-    
-    if (txs.length > 0) {
-        const data = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-
-        let isBase64 = false;
-        let payload = null;
-
-        try {
-            payload = JSON.parse(data.toString());
-        } catch (error) {
-            isBase64 = true;
-        }
-
-        if (isBase64) {
-            payload = await DecompressBlock(data.toString());
-        }
-
-        return payload;
-    } else {
-        return null;
-    }
-}
-
-export async function RetrieveBlockByBlockhash(blockhash: string) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', SolarweaveConfig.database),
-            equals('blockhash', blockhash),
-        ),
-    );
-
-    if (txs.length > 0) {
-        const data = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-
-        let isBase64 = false;
-        let payload = null;
-
-        try {
-            payload = JSON.parse(data.toString());
-        } catch (error) {
-            isBase64 = true;
-        }
-
-        if (isBase64) {
-            payload = await DecompressBlock(data.toString());
-        }
-
-        return payload;
-    } else {
-        return null;
+        await arweave.transactions.sign(tx, key);
+        await arweave.transactions.post(tx);
     }
 }

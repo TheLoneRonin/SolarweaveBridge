@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Log = void 0;
-const Config_1 = require("../Config");
+var Config_1 = require("../Config");
 function Log(output) {
     Config_1.SolarweaveConfig.console ? console.log(output) : null;
 }

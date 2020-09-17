@@ -4,7 +4,8 @@ import { SolarweaveConfig } from '../Config';
 import { Log } from '../util/Log.util';
 import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
-import { SubmitBlockToArweave, RetrieveBlockByBlockhash } from '../service/Arweave.service';
+import { SubmitBlockToArweave } from './Arweave.service';
+import { RetrieveBlockByBlockhash } from './ARQL.service';
 import { GetSlot, GetBlock } from './Solana.rpc.service';
 
 export async function GetLatestBlock() {
@@ -84,7 +85,9 @@ export async function CacheBlock(Slot) {
     const blockPayload = await GetBlock(Slot);
     const Block = blockPayload.body.result;
 
-    if (Block.blockhash) {
+    if (!Block) {
+        Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+    } else if (Block.blockhash) {
         const Error: string = await AddBlockToCache(Block, Slot);
         if (Error) { Log(Error) }
     } else {

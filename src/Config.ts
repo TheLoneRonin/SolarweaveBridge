@@ -1,13 +1,22 @@
-import Arweave = require('arweave');
+const Arweave = require('arweave');
 import { SolarweaveInterface } from './interface/Solarweave.interface';
 
-export const arweave = Arweave.init({
-    host: 'arweave.net',
-    port: 443,
-    protocol: 'https',
-    timeout: 20000,
-    logging: false,
-});
+export const arweave = Arweave.init ?
+    Arweave.init({
+        host: 'arweave.net',
+        port: 443,
+        protocol: 'https',
+        timeout: 20000,
+        logging: false,
+    })
+    :
+    Arweave.default.init({
+        host: 'arweave.net',
+        port: 443,
+        protocol: 'https',
+        timeout: 20000,
+        logging: false,
+    });
 
 export let SolarweaveConfig: SolarweaveInterface = {
     rpc_version: `2.0`,

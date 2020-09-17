@@ -1,27 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("colors");
-const fs_jetpack_1 = require("fs-jetpack");
-const Balance = JSON.parse(fs_jetpack_1.read(`${__dirname}/../../benchmarks/benchmark.balance.json`));
-const BalanceEpoch = Balance.epoch;
-const BalanceEpochEnd = Balance.actions[0].epoch;
-const BalanceTime = BalanceEpochEnd - BalanceEpoch;
-console.log(`Estimated time in ms to query balance`, `${BalanceTime}ms`.green.bold);
-const Block = JSON.parse(fs_jetpack_1.read(`${__dirname}/../../benchmarks/benchmark.block.json`));
-const BlockEpoch = Block.epoch;
-const BlockEpochEnd = Block.actions[0].epoch;
-const BlockTime = BlockEpochEnd - BlockEpoch;
-console.log(`Estimated time in ms to query latest block`, `${BlockTime}ms`.green.bold);
-const Cache1 = JSON.parse(fs_jetpack_1.read(`${__dirname}/../../benchmarks/benchmark.cache.p1.json`));
+var fs_jetpack_1 = require("fs-jetpack");
+var Balance = JSON.parse(fs_jetpack_1.read(__dirname + "/../../benchmarks/benchmark.balance.json"));
+var BalanceEpoch = Balance.epoch;
+var BalanceEpochEnd = Balance.actions[0].epoch;
+var BalanceTime = BalanceEpochEnd - BalanceEpoch;
+console.log("Estimated time in ms to query balance", (BalanceTime + "ms").green.bold);
+var Block = JSON.parse(fs_jetpack_1.read(__dirname + "/../../benchmarks/benchmark.block.json"));
+var BlockEpoch = Block.epoch;
+var BlockEpochEnd = Block.actions[0].epoch;
+var BlockTime = BlockEpochEnd - BlockEpoch;
+console.log("Estimated time in ms to query latest block", (BlockTime + "ms").green.bold);
+var Cache1 = JSON.parse(fs_jetpack_1.read(__dirname + "/../../benchmarks/benchmark.cache.p1.json"));
 console.log('');
-let Cache1Total = 0;
-let Cache1Average = '';
-let Cache1Low = 9999999;
-let Cache1High = -1;
-for (let i = 1; i < Cache1.actions.length; i++) {
-    const PrevAction = Cache1.actions[i - 1];
-    const Action = Cache1.actions[i];
-    const Time = Action.epoch - PrevAction.epoch;
+var Cache1Total = 0;
+var Cache1Average = '';
+var Cache1Low = 9999999;
+var Cache1High = -1;
+for (var i = 1; i < Cache1.actions.length; i++) {
+    var PrevAction = Cache1.actions[i - 1];
+    var Action = Cache1.actions[i];
+    var Time = Action.epoch - PrevAction.epoch;
     Cache1Total += Time;
     if (Time < Cache1Low) {
         Cache1Low = Time;
@@ -31,19 +31,19 @@ for (let i = 1; i < Cache1.actions.length; i++) {
     }
 }
 Cache1Average = (Cache1Total / Cache1.actions.length).toFixed(0);
-console.log(`Cache P1 Block Average Block Upload Time`, `${Cache1Average}ms`.green.bold);
-console.log(`Cache P1 Block Lowest Block Upload Time`, `${Cache1Low}ms`.green.bold);
-console.log(`Cache P1 Block Highest Block Upload Time`, `${Cache1High}ms`.green.bold);
-const Livestream1 = JSON.parse(fs_jetpack_1.read(`${__dirname}/../../benchmarks/benchmark.livestream.p1.json`));
+console.log("Cache P1 Block Average Block Upload Time", (Cache1Average + "ms").green.bold);
+console.log("Cache P1 Block Lowest Block Upload Time", (Cache1Low + "ms").green.bold);
+console.log("Cache P1 Block Highest Block Upload Time", (Cache1High + "ms").green.bold);
+var Livestream1 = JSON.parse(fs_jetpack_1.read(__dirname + "/../../benchmarks/benchmark.livestream.p1.json"));
 console.log('');
-let Livestream1Total = 0;
-let Livestream1Average = '';
-let Livestream1Low = 9999999;
-let Livestream1High = -1;
-for (let i = 1; i < Livestream1.actions.length; i++) {
-    const PrevAction = Livestream1.actions[i - 1];
-    const Action = Livestream1.actions[i];
-    const Time = Action.epoch - PrevAction.epoch;
+var Livestream1Total = 0;
+var Livestream1Average = '';
+var Livestream1Low = 9999999;
+var Livestream1High = -1;
+for (var i = 1; i < Livestream1.actions.length; i++) {
+    var PrevAction = Livestream1.actions[i - 1];
+    var Action = Livestream1.actions[i];
+    var Time = Action.epoch - PrevAction.epoch;
     Livestream1Total += Time;
     if (Time < Livestream1Low) {
         Livestream1Low = Time;
@@ -53,7 +53,7 @@ for (let i = 1; i < Livestream1.actions.length; i++) {
     }
 }
 Livestream1Average = (Livestream1Total / Livestream1.actions.length).toFixed(0);
-console.log(`Livestream P1 Block Average Block Upload Time`, `${Livestream1Average}ms`.green.bold);
-console.log(`Livestream P1 Block Lowest Block Upload Time`, `${Livestream1Low}ms`.green.bold);
-console.log(`Livestream P1 Block Highest Block Upload Time`, `${Livestream1High}ms`.green.bold);
+console.log("Livestream P1 Block Average Block Upload Time", (Livestream1Average + "ms").green.bold);
+console.log("Livestream P1 Block Lowest Block Upload Time", (Livestream1Low + "ms").green.bold);
+console.log("Livestream P1 Block Highest Block Upload Time", (Livestream1High + "ms").green.bold);
 //# sourceMappingURL=Benchmarks.js.map

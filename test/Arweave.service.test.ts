@@ -2,7 +2,8 @@ import Arweave = require('arweave');
 import { equal } from 'assert';
 import { SolarweaveConfig } from '../src/Config';
 import { ArweaveTransaction } from '../src/interface/Arweave.interface';
-import { LoadWallet, GetBalance, SubmitBlockToArweave, CreateBlockIndices, RetrieveBlockBySlot, RetrieveBlockByBlockhash } from '../src/service/Arweave.service';
+import { LoadWallet, GetBalance, SubmitBlockToArweave, CreateBlockIndices } from '../src/service/Arweave.service';
+import { RetrieveBlockBySlot, RetrieveBlockByBlockhash } from '../src/service/ARQL.service';
 
 export const arweave = Arweave.init({
     host: 'arweave.net',
@@ -87,8 +88,7 @@ describe('Arweave Service Tests', () => {
         const transaction: ArweaveTransaction = PrepareTransaction(SampleBlock, slot);
 
         let tx = await arweave.createTransaction({ data: JSON.stringify(SampleBlock) }, key);
-
-        tx = await CreateBlockIndices(key, tx, transaction);
+        await CreateBlockIndices(key, transaction);
     });
 
     it('Should submit a block to Arweave', async () => {

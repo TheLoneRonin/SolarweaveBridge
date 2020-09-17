@@ -8,7 +8,9 @@ An easy, simple and effective way to store Solana Blocks into Arweave via comman
 
 Solarweave uses extensive tag annotations in order to make it as easy as possible to navigate the database via `ArQL`. Check the **ArQL** section to learn more.
 
-If you want to review the benchmarks for Solarweave, check out the [Benchmarks](./BENCHMARKS.md) file!
+If you want to review the benchmarks for Solarweave, check out the [Benchmarks](./BENCHMARKS.md) document.
+
+Solarweave is also now accessible as a library. Check out the [Library](./LIBRARY.md) document to learn more!
 
 ----
 
