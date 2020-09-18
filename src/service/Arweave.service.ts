@@ -2,6 +2,7 @@ import { read } from 'fs-jetpack';
 
 import { SolarweaveConfig, arweave } from '../Config';
 import { Log } from '../util/Log.util';
+import { DetermineLowerbound, DetermineUpperbound } from '../util/Bound.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { CompressBlock } from '../service/Compression.service';
 
@@ -31,6 +32,9 @@ export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
     tx.addTag('slot', transaction.tags.slot);
     tx.addTag('blockhash', transaction.tags.blockhash);
     tx.addTag('compressed', SolarweaveConfig.compressed ? 'true' : 'false');
+
+    tx.addTag('lowerbound', DetermineLowerbound(Number(transaction.tags.slot)).toString());
+    tx.addTag('upperbound', DetermineUpperbound(Number(transaction.tags.slot)).toString());
 
     for (let i = 0; i < transaction.tags.transactions.length; i++) {
         const solTx = transaction.tags.transactions[i];
@@ -98,6 +102,9 @@ export async function CreateBlockIndices(key, transaction: ArweaveTransaction) {
         tx.addTag('slot', transaction.tags.slot);
         tx.addTag('blockhash', transaction.tags.blockhash);
 
+        tx.addTag('lowerbound', DetermineLowerbound(Number(transaction.tags.slot)).toString());
+        tx.addTag('upperbound', DetermineUpperbound(Number(transaction.tags.slot)).toString());
+
         await arweave.transactions.sign(tx, key);
         await arweave.transactions.post(tx);
     }
@@ -111,6 +118,9 @@ export async function CreateBlockIndices(key, transaction: ArweaveTransaction) {
         tx.addTag('parentSlot', transaction.tags.parentSlot);
         tx.addTag('slot', transaction.tags.slot);
         tx.addTag('blockhash', transaction.tags.blockhash);
+
+        tx.addTag('lowerbound', DetermineLowerbound(Number(transaction.tags.slot)).toString());
+        tx.addTag('upperbound', DetermineUpperbound(Number(transaction.tags.slot)).toString());
 
         await arweave.transactions.sign(tx, key);
         await arweave.transactions.post(tx);

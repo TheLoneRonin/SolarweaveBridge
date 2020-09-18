@@ -1,2 +1,2 @@
-import { RetrieveBlockBySlot, RetrieveBlockByBlockhash, RetrieveBlocksFromAccount, RetrieveBlocksFromSignature, RetrieveBlockData } from './service/ARQL.service';
-export { RetrieveBlockBySlot, RetrieveBlockByBlockhash, RetrieveBlocksFromAccount, RetrieveBlocksFromSignature, RetrieveBlockData, };
+import { RetrieveBlockBySlot, RetrieveBlockByBlockhash, RetrieveBlocksFromAccount, RetrieveBlockBySignature, RetrieveBlockData } from './service/ARQL.service';
+export { RetrieveBlockBySlot, RetrieveBlockByBlockhash, RetrieveBlocksFromAccount, RetrieveBlockBySignature, RetrieveBlockData, };

@@ -40,6 +40,7 @@ exports.CreateBlockIndices = exports.SubmitBlockToArweave = exports.GetBalance =
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
+var Bound_util_1 = require("../util/Bound.util");
 var Compression_service_1 = require("../service/Compression.service");
 function LoadWallet() {
     return __awaiter(this, void 0, void 0, function () {
@@ -97,6 +98,8 @@ function SubmitBlockToArweave(transaction) {
                     tx.addTag('slot', transaction.tags.slot);
                     tx.addTag('blockhash', transaction.tags.blockhash);
                     tx.addTag('compressed', Config_1.SolarweaveConfig.compressed ? 'true' : 'false');
+                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
+                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
                     for (i = 0; i < transaction.tags.transactions.length; i++) {
                         solTx = transaction.tags.transactions[i];
                         tx.addTag("tx-" + i + "-numReadonlySignedAccounts", solTx.numReadonlySignedAccounts.toString());
@@ -167,6 +170,8 @@ function CreateBlockIndices(key, transaction) {
                     tx.addTag('parentSlot', transaction.tags.parentSlot);
                     tx.addTag('slot', transaction.tags.slot);
                     tx.addTag('blockhash', transaction.tags.blockhash);
+                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
+                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
                 case 3:
                     _a.sent();
@@ -191,6 +196,8 @@ function CreateBlockIndices(key, transaction) {
                     tx.addTag('parentSlot', transaction.tags.parentSlot);
                     tx.addTag('slot', transaction.tags.slot);
                     tx.addTag('blockhash', transaction.tags.blockhash);
+                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
+                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
                 case 9:
                     _a.sent();

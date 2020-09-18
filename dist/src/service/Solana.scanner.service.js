@@ -138,18 +138,22 @@ function CacheBlock(Slot) {
                 case 1:
                     blockPayload = _a.sent();
                     Block = blockPayload.body.result;
-                    if (!Block.blockhash) return [3 /*break*/, 3];
-                    return [4 /*yield*/, AddBlockToCache(Block, Slot)];
+                    if (!!Block) return [3 /*break*/, 2];
+                    Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
+                    return [3 /*break*/, 5];
                 case 2:
+                    if (!Block.blockhash) return [3 /*break*/, 4];
+                    return [4 /*yield*/, AddBlockToCache(Block, Slot)];
+                case 3:
                     Error_1 = _a.sent();
                     if (Error_1) {
                         Log_util_1.Log(Error_1);
                     }
-                    return [3 /*break*/, 4];
-                case 3:
+                    return [3 /*break*/, 5];
+                case 4:
                     Log_util_1.Log("Solarweave is now in sync with the latest block".yellow);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    _a.label = 5;
+                case 5: return [2 /*return*/];
             }
         });
     });

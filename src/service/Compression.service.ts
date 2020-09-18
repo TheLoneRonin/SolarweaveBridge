@@ -10,7 +10,7 @@ export async function CompressBlock(Block): Promise<string> {
 }
 
 export async function DecompressBlock(Block64): Promise<any> {
-    const uncompressed = zlib.inflateSync(Buffer.from(Block64, 'base64'));
+    const uncompressed = zlib.inflateSync(Buffer.from(Block64.toString(), 'base64'));
     const data = JSON.parse(uncompressed.toString());
 
     return data;

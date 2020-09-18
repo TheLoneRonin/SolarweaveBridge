@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RetrieveBlockData = exports.RetrieveBlocksFromSignature = exports.RetrieveBlocksFromAccount = exports.RetrieveBlockByBlockhash = exports.RetrieveBlockBySlot = exports.ParsePayload = void 0;
+exports.RetrieveBlockData = exports.RetrieveBlocksFromAccount = exports.RetrieveBlockBySignature = exports.RetrieveBlockByBlockhash = exports.RetrieveBlockBySlot = exports.ParsePayload = void 0;
 var arql_ops_1 = require("arql-ops");
 var Config_1 = require("../Config");
 var Compression_service_1 = require("../service/Compression.service");
@@ -89,40 +89,45 @@ exports.RetrieveBlockBySlot = RetrieveBlockBySlot;
 function RetrieveBlockByBlockhash(blockhash, database) {
     if (database === void 0) { database = "" + Config_1.SolarweaveConfig.database; }
     return __awaiter(this, void 0, void 0, function () {
-        var txs, metadata, error_1, data;
+        var txs, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Config_1.arweave.arql(arql_ops_1.and(arql_ops_1.equals('database', database), arql_ops_1.equals('blockhash', blockhash)))];
                 case 1:
                     txs = _a.sent();
-                    if (!(txs.length > 0)) return [3 /*break*/, 8];
-                    _a.label = 2;
+                    if (!(txs.length > 0)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, Config_1.arweave.transactions.getData(txs[0], { decode: true, string: true })];
                 case 2:
-                    _a.trys.push([2, 4, , 5]);
-                    return [4 /*yield*/, Config_1.arweave.transactions.get(txs[0])];
-                case 3:
-                    metadata = _a.sent();
-                    metadata.get('tags').forEach(function (tag) {
-                        var key = tag.get('name', { decode: true, string: true });
-                        var value = tag.get('value', { decode: true, string: true });
-                        console.log(key, value);
-                    });
-                    return [3 /*break*/, 5];
-                case 4:
-                    error_1 = _a.sent();
-                    console.log(error_1);
-                    return [3 /*break*/, 5];
-                case 5: return [4 /*yield*/, Config_1.arweave.transactions.getData(txs[0], { decode: true, string: true })];
-                case 6:
                     data = _a.sent();
                     return [4 /*yield*/, ParsePayload(data)];
-                case 7: return [2 /*return*/, _a.sent()];
-                case 8: return [2 /*return*/, null];
+                case 3: return [2 /*return*/, _a.sent()];
+                case 4: return [2 /*return*/, null];
             }
         });
     });
 }
 exports.RetrieveBlockByBlockhash = RetrieveBlockByBlockhash;
+function RetrieveBlockBySignature(signature, database) {
+    if (database === void 0) { database = Config_1.SolarweaveConfig.database + "-index"; }
+    return __awaiter(this, void 0, void 0, function () {
+        var txs, blockhash;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Config_1.arweave.arql(arql_ops_1.and(arql_ops_1.equals('database', database), arql_ops_1.equals('signature', signature)))];
+                case 1:
+                    txs = _a.sent();
+                    if (!(txs.length > 0)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, Config_1.arweave.transactions.getData(txs[0], { decode: true, string: true })];
+                case 2:
+                    blockhash = _a.sent();
+                    return [4 /*yield*/, RetrieveBlockByBlockhash(blockhash)];
+                case 3: return [2 /*return*/, _a.sent()];
+                case 4: return [2 /*return*/, null];
+            }
+        });
+    });
+}
+exports.RetrieveBlockBySignature = RetrieveBlockBySignature;
 function RetrieveBlocksFromAccount(accountKey, database) {
     if (database === void 0) { database = Config_1.SolarweaveConfig.database + "-index"; }
     return __awaiter(this, void 0, void 0, function () {
@@ -138,21 +143,6 @@ function RetrieveBlocksFromAccount(accountKey, database) {
     });
 }
 exports.RetrieveBlocksFromAccount = RetrieveBlocksFromAccount;
-function RetrieveBlocksFromSignature(signature, database) {
-    if (database === void 0) { database = Config_1.SolarweaveConfig.database + "-index"; }
-    return __awaiter(this, void 0, void 0, function () {
-        var txs;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Config_1.arweave.arql(arql_ops_1.and(arql_ops_1.equals('database', database), arql_ops_1.equals('signature', signature)))];
-                case 1:
-                    txs = _a.sent();
-                    return [2 /*return*/, txs];
-            }
-        });
-    });
-}
-exports.RetrieveBlocksFromSignature = RetrieveBlocksFromSignature;
 function RetrieveBlockData(arweaveTxId) {
     return __awaiter(this, void 0, void 0, function () {
         var data, metadata;

@@ -57,7 +57,7 @@ function DecompressBlock(Block64) {
     return __awaiter(this, void 0, void 0, function () {
         var uncompressed, data;
         return __generator(this, function (_a) {
-            uncompressed = zlib_1.default.inflateSync(Buffer.from(Block64, 'base64'));
+            uncompressed = zlib_1.default.inflateSync(Buffer.from(Block64.toString(), 'base64'));
             data = JSON.parse(uncompressed.toString());
             return [2 /*return*/, data];
         });

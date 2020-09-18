@@ -1,7 +1,7 @@
 import { and, equals } from 'arql-ops';
 
 import { SolarweaveConfig, arweave } from '../Config';
-import { CompressBlock, DecompressBlock } from '../service/Compression.service';
+import { DecompressBlock } from '../service/Compression.service';
 
 export async function ParsePayload(data) {
     let isBase64 = false;
@@ -45,20 +45,24 @@ export async function RetrieveBlockByBlockhash(blockhash: string, database: stri
     );
 
     if (txs.length > 0) {
-        try {
-            const metadata = await arweave.transactions.get(txs[0]);
-            metadata.get('tags').forEach(tag => {
-                const key = tag.get('name', { decode: true, string: true });
-                const value = tag.get('value', { decode: true, string: true });
-
-                console.log(key, value);
-            });
-        } catch (error) {
-            console.log(error);
-        }
-
         const data = await arweave.transactions.getData(txs[0], { decode: true, string: true });
         return await ParsePayload(data);
+    } else {
+        return null;
+    }
+}
+
+export async function RetrieveBlockBySignature(signature: string, database: string = `${SolarweaveConfig.database}-index`) {
+    const txs = await arweave.arql(
+        and(
+            equals('database', database),
+            equals('signature', signature),
+        ),
+    );
+
+    if (txs.length > 0) {
+        const blockhash = await arweave.transactions.getData(txs[0], { decode: true, string: true });
+        return await RetrieveBlockByBlockhash(blockhash);
     } else {
         return null;
     }
@@ -69,17 +73,6 @@ export async function RetrieveBlocksFromAccount(accountKey: string, database: st
         and(
             equals('database', database),
             equals('accountKey', accountKey),
-        ),
-    );
-
-    return txs;
-}
-
-export async function RetrieveBlocksFromSignature(signature: string, database: string = `${SolarweaveConfig.database}-index`) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', database),
-            equals('signature', signature),
         ),
     );
 

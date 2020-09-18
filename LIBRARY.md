@@ -95,17 +95,20 @@ console.log(BlockTransactions);
 **Type Definition**:
 
 ```typescript
-function RetrieveBlocksFromSignature(accountKey: string, database?: string): Promise<Array<string>>
+function RetrieveBlockBySignature(signature: string, database?: string): Promise<Array<string>>
 ```
 
 **Example Usage**:
 
 ```typescript
-import { RetrieveBlocksFromSignature } from '@theronin/solarweave';
+import { RetrieveBlockBySignature } from '@theronin/solarweave';
 
-const BlockTransactions = await RetrieveBlocksFromSignature('3kKSaci98YvEYa8df66qkHNYYE83gTox9DtBcH5ubSGXcSFc2AcDGBoU7MizVrErYpTzz2pxxFoubWFzJKkqcy8u');
+const BlockData = await RetrieveBlockBySignature('3kKSaci98YvEYa8df66qkHNYYE83gTox9DtBcH5ubSGXcSFc2AcDGBoU7MizVrErYpTzz2pxxFoubWFzJKkqcy8u');
 
-console.log(BlockTransactions);
+if (BlockData) {
+    const Block = JSON.parse(BlockData);
+    console.log(Block);
+}
 ```
 
 #### `RetrieveBlockData`

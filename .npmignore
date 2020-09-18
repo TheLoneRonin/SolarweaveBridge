@@ -1,6 +1,0 @@
-.codecov.yml
-.travis.yml
-*.md
-
-benchmarks/*
-test/*
