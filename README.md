@@ -16,7 +16,9 @@ Solarweave is also now accessible as a library. Check out the [Library](./LIBRAR
 
 ## Getting started
 
-First install `solarweave` via `npm` or `yarn`
+<img align="center" src="https://gitlab.com/cervoneluca/openbits/-/raw/master/assets/logo-black.png" height="50px" alt="OpenBits logo" title="OpenBits Logo"> This package is also available on OpenBits
+
+First install `solarweave` via `npm`, `yarn` or `openbits`
 
 ```bash
 npm install @theronin/solarweave --global
@@ -28,7 +30,14 @@ npm install @theronin/solarweave --global
 yarn global add @theronin/solarweave
 ```
 
-You should be then able to run the `solarweave` help command which will output the following:
+*or*
+
+```bash
+npm install openbits --global
+openbits install @theronin/solarweave --global
+```
+
+Confirm your installation of `solarweave` by running the help command which will output the following:
 
 ```bash
 solarweave help
