@@ -1,38 +1,36 @@
-import Arweave = require('arweave');
 import { equal } from 'assert';
-import { and, equals } from 'arql-ops';
-
-export const arweave = Arweave.init({
-    host: 'arweave.net',
-    port: 443,
-    protocol: 'https',
-    timeout: 20000,
-    logging: false,
-});
+import { GraphQL, RetrieveAccount, RetrieveBlocks, RetrieveBlock } from '../src/service/ARQL.service';
 
 describe('ARQL Tests', () => {
-    const block = '1025219';
+    it('Should be able to run a basic GraphQL Query', async () => {
+        const Edges = await GraphQL(`query {
+            transactions {
+                edges {
+                    cursor 
+                    node {
+                        id
+                    }
+                }
+            }
+        }`);
 
-    it('Should retrieve Block #1025219 from the database', async () => {
-        const txs = await arweave.arql(
-            and(
-                equals('database', 'solarweave-devnet'),
-                equals('slot', block),
-            ),
-        );
+        console.log(Edges);
 
-        const dataString = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-        equal(typeof dataString, 'string');
+        equal(Edges !== null, true);
     });
 
-    it('Should retrieve the first block found from the Solarweave Database', async () => {
-        const txs = await arweave.arql(
-            and(
-                equals('database', 'solarweave-devnet'),
-            ),
-        );
+    it('Should be able to retrieve entries from the Vote Account', async () => {
+        const Edges = await RetrieveAccount('Vote111111111111111111111111111111111111111', 3, '', 'solarweave-cache-devnet-testrun1-index');
+        equal(Edges.length === 3, true);
+    });
 
-        const dataString = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-        equal(typeof dataString, 'string');
+    it('Should be able to retrieve latest entries from the database', async () => {
+        const Edges = await RetrieveBlocks(3, '', 'solarweave-cache-devnet-testrun1');
+        equal(Edges.length === 3, true);
+    });
+
+    it('Should be able to retrieve actual block data', async () => {
+        const BlockData = await RetrieveBlock('AXhCf_ARKlIEmpvQaRSXnbAuVh0KRxG5B1ybZP0mhMM');
+        equal(BlockData !== null, true);
     });
 });

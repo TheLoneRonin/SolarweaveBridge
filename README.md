@@ -40,28 +40,30 @@ openbits install @theronin/solarweave --global
 Confirm your installation of `solarweave` by running the help command which will output the following:
 
 ```bash
-solarweave help
+$ solarweave help
 
 Usage: Solarweave Bridge [options] [command]
 
 Options:
   --database [name]          the name of the database (for Arweave ArQL tags) (default: "solarweave-devnet")
+  --gql [URL]                the Arweave GraphQL URL to query blocks (default: "https://arweave.dev/graphql")
   --url [RPC URL]            the Solana RPC URL to query blocks from (default: "https://devnet.solana.com")
   --credentials [file path]  specify the path to the json file containing your Arweave credentials (default: ".arweave.creds.json")
   --local                    cache locally to a JSON file instead of to Arweave (default: false)
   --localFile [file path]    if caching data locally, specify the file path (default: "solarweave.cache.json")
   --console                  do not output log data to console (default: false)
   --uncompressed             store blocks in an uncompressed format (default: false)
-  --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")
+  --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")     
   --benchmark                benchmark Solarweave and start tracking size and speed stats stored in benchmark.json (default: false)
-  --noverify                 if caching to Arweave do not double check if the block was already submitted (default: false)  -h, --help                     display help for command        
+  --noverify                 if caching to Arweave do not double check if the block was already submitted (default: false)
+  -h, --help                 display help for command
 
 Commands:
   balance                    retrieve the public address and balance of your Arweave wallet
   latest                     retrieve the latest block and output the block to console
   livestream                 livestream blocks directly to your arweave database (or locally)
   cache                      retrieve all the blocks that are still available and store them in Arweave
-  help [command]             display help for command  
+  help [command]             display help for command
 ```
 
 #### Setting credentials
@@ -165,6 +167,14 @@ If you want to query blocks from a different RPC url. You can use the `url` flag
 
 ```bash
 $ solarweave --url https://devnet.solana.com
+```
+
+#### GraphQL URL
+
+If you want to query blocks from a different GraphQL url. You can use the `gql` flag.
+
+```bash
+$ solarweave --gql https://arweave.dev/graphql
 ```
 
 #### Database tag

@@ -51,6 +51,7 @@ exports.Benchmark = {
 exports.Solarweave = new commander_1.Command('Solarweave Bridge');
 exports.Solarweave
     .option('--database [name]', 'the name of the database (for Arweave ArQL tags)', 'solarweave-devnet')
+    .option('--gql [URL]', 'the Arweave GraphQL URL to query blocks', 'https://arweave.dev/graphql')
     .option('--url [RPC URL]', 'the Solana RPC URL to query blocks from', 'https://devnet.solana.com')
     .option('--credentials [file path]', 'specify the path to the json file containing your Arweave credentials', '.arweave.creds.json')
     .option('--local', 'cache locally to a JSON file instead of to Arweave', false)

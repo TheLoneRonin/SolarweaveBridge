@@ -17,10 +17,10 @@ Solarweave supports both `Classic` and `ESNext` imports.
 
 ```javascript
 // OK
-import { RetrieveBlockBySlot } from '@theronin/solarweave';
+import { RetrieveBlock } from '@theronin/solarweave';
 
 // OK
-const { RetrieveBlockBySlot } = require('@theronin/solarweave');
+const { RetrieveBlock } = require('@theronin/solarweave');
 
 // OK
 const solarweave = require('@theronin/solarweave');
@@ -30,20 +30,71 @@ const solarweave = require('@theronin/solarweave');
 
 ### Type Definitions with Examples
 
-#### `RetrieveBlockBySlot`
+#### `GraphQL`
 
 **Type Definition**:
 
 ```typescript
-function RetrieveBlockBySlot(slot: number, database?: string): Promise<string>
+function GraphQL(query: string): Promise<ArweaveBlock>
+```
+
+Run a GraphQL
+
+**Example Usage**:
+
+```typescript
+import { GraphQL } from '@theronin/solarweave';
+
+const Transactions = await GraphQL(`query {
+    transactions {
+        edges {
+            cursor
+            node {
+                id
+                tags {
+                    name
+                    value
+                }
+            }
+        }
+    }
+}`);
+
+console.log(Transactions);
+```
+
+#### `RetrieveBlocks`
+
+**Type Definition**:
+
+```typescript
+function RetrieveBlocks(first?: number, after?: string, database?: string): Promise<ArweaveBlock>
 ```
 
 **Example Usage**:
 
 ```typescript
-import { RetrieveBlockBySlot } from '@theronin/solarweave';
+import { RetrieveBlocks } from '@theronin/solarweave';
 
-const BlockData = await RetrieveBlockBySlot(88888);
+const Transactions = await RetrieveBlocks(25, '', 'solarweave-devnet');
+
+console.log(Transactions);
+```
+
+#### `RetrieveBlock`
+
+**Type Definition**:
+
+```typescript
+function RetrieveBlock(arweaveBlockhash: string): Promise<SolanaBlock>
+```
+
+**Example Usage**:
+
+```typescript
+import { RetrieveBlock } from '@theronin/solarweave';
+
+const BlockData = await RetrieveBlock('L-6uiIpiQWZHCCr_x2qKIOYOutplZaS0BN2YQdq_i-4');
 
 if (BlockData) {
     const Block = JSON.parse(BlockData);
@@ -51,20 +102,20 @@ if (BlockData) {
 }
 ```
 
-#### `RetrieveBlockByBlockhash`
+#### `RetrieveBlockhash`
 
 **Type Definition**:
 
 ```typescript
-function RetrieveBlockByBlockhash(blockhash: string, database?: string): Promise<string>
+function RetrieveBlockhash(solanaBlockhash: string, database?: string): Promise<SolanaBlock>
 ```
 
 **Example Usage**:
 
 ```typescript
-import { RetrieveBlockByBlockhash } from '@theronin/solarweave';
+import { RetrieveBlockhash } from '@theronin/solarweave';
 
-const BlockData = await RetrieveBlockByBlockhash('6r7DWE4Mmkn9SpW5WCdnCdjCTfn1wwt61QdWJJtHV7z7');
+const BlockData = await RetrieveBlockhash('21wUtkKgK1PN3xMtSYrJSxxcz171ePqdgv9vfLXdAdNF');
 
 if (BlockData) {
     const Block = JSON.parse(BlockData);
@@ -72,38 +123,20 @@ if (BlockData) {
 }
 ```
 
-#### `RetrieveBlocksFromAccount`
+#### `RetrieveSignature`
 
 **Type Definition**:
 
 ```typescript
-function RetrieveBlocksFromAccount(accountKey: string, database?: string): Promise<Array<string>>
+function RetrieveSignature(solanaSignature: string, database?: string): Promise<SolanaBlock>
 ```
 
 **Example Usage**:
 
 ```typescript
-import { RetrieveBlocksFromAccount } from '@theronin/solarweave';
+import { RetrieveSignature } from '@theronin/solarweave';
 
-const BlockTransactions = await RetrieveBlocksFromAccount('Vote111111111111111111111111111111111111111');
-
-console.log(BlockTransactions);
-```
-
-#### `RetrieveBlocksFromSignature`
-
-**Type Definition**:
-
-```typescript
-function RetrieveBlockBySignature(signature: string, database?: string): Promise<Array<string>>
-```
-
-**Example Usage**:
-
-```typescript
-import { RetrieveBlockBySignature } from '@theronin/solarweave';
-
-const BlockData = await RetrieveBlockBySignature('3kKSaci98YvEYa8df66qkHNYYE83gTox9DtBcH5ubSGXcSFc2AcDGBoU7MizVrErYpTzz2pxxFoubWFzJKkqcy8u');
+const BlockData = await RetrieveBlockhash('4D7jBHU3d6bSaMmVr8ViLMB3J4G99RR7FqrAy1iQceXvBVBgSYqrxVBAZCcBK6RegudZzTKU4wPWrBL9PFgWvQ4j');
 
 if (BlockData) {
     const Block = JSON.parse(BlockData);
@@ -111,28 +144,27 @@ if (BlockData) {
 }
 ```
 
-#### `RetrieveBlockData`
+#### `RetrieveAccount`
 
 **Type Definition**:
 
 ```typescript
-function RetrieveBlockData(arweaveTxId: string): Promise<{
-    database: string;
-    slot: string;
-    parentSlot: string;
-    accountKey: string;
-    blockhash: string;
-    defaultSignature: string;
-}>
+function RetrieveAccount(accountKey: string, first?: number, after?: string, database?: string): Promise<ArweaveBlock>
 ```
 
 **Example Usage**:
 
 ```typescript
-import { RetrieveBlocksFromAccount, RetrieveBlockData } from '@theronin/solarweave';
+import { RetrieveAccount, RetrieveBlock } from '@theronin/solarweave';
 
-const BlockTransactions = await RetrieveBlocksFromAccount('Vote111111111111111111111111111111111111111');
+const AccountTransactions = await RetrieveAccount('Vote111111111111111111111111111111111111111', 25, 'WyIyMDIwLTA5LTI0VDE3OjExOjEwLjM4NFoiLDFd', 'solarweave-devnet-index');
 
-const ExampleTx = BlockTransactions[0];
-const BlockData = await RetrieveBlockData(ExampleTx);
+AccountTransactions.forEach(async edge => {
+    const BlockData = await RetrieveBlock(edge.node.id);
+
+    if (BlockData) {
+        const Block = JSON.parse(BlockData);
+        console.log(Block);
+    }
+});
 ```

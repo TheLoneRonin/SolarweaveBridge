@@ -21,6 +21,7 @@ exports.arweave = Arweave.init ?
 exports.SolarweaveConfig = {
     rpc_version: "2.0",
     database: 'solarweave-devnet',
+    arweaveGraphQL: 'https://arweave.dev/graphql',
     url: "https://devnet.solana.com",
     credentials: ".arweave.creds.json",
     local: false,
@@ -31,10 +32,11 @@ exports.SolarweaveConfig = {
     benchmark: false,
     verify: true,
 };
-function UpdateConfig(rpc_version, database, url, credentials, local, localFile, console, compressed, parallelize, benchmark, verify) {
+function UpdateConfig(rpc_version, database, arweaveGraphQL, url, credentials, local, localFile, console, compressed, parallelize, benchmark, verify) {
     exports.SolarweaveConfig = {
         database: database,
         rpc_version: rpc_version,
+        arweaveGraphQL: arweaveGraphQL,
         url: url,
         credentials: credentials,
         local: local,

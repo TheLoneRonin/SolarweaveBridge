@@ -1,3 +1,4 @@
+import { post } from 'superagent';
 import { and, equals } from 'arql-ops';
 
 import { SolarweaveConfig, arweave } from '../Config';
@@ -20,83 +21,139 @@ export async function ParsePayload(data) {
     return payload;
 }
 
-export async function RetrieveBlockBySlot(slot: number, database: string = `${SolarweaveConfig.database}`) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', database),
-            equals('slot', slot.toString()),
-        ),
-    );
+export async function GraphQL(query: string) {
+    const payload = await post(SolarweaveConfig.arweaveGraphQL)
+        .send({ query });
     
-    if (txs.length > 0) {
-        const data = await arweave.transactions.getData(txs[0], { decode: true, string: true });
+    return payload.body.data.transactions.edges;
+}
+
+export async function RetrieveBlocks(first: number = 25, after?: string,  database: string = `${SolarweaveConfig.database}-index`) {
+    const query = `query {
+        transactions(
+            first: ${first},
+            ${after ? `after: "${after}"` : ``},
+            tags: [
+                { name: "database", values: ["${database}"] }
+            ],
+            sort: HEIGHT_DESC
+        ) {
+            edges {
+                cursor
+                node {
+                    id
+                    tags {
+                        name
+                        value
+                    }
+                }
+            }
+        }
+    }`;
+
+    return await GraphQL(query);
+}
+
+export async function RetrieveBlock(arweaveBlockhash: string) {
+    const data = await arweave.transactions.getData(arweaveBlockhash, { decode: true, string: true });
+    if (data) {
         return await ParsePayload(data);
     } else {
         return null;
     }
 }
 
-export async function RetrieveBlockByBlockhash(blockhash: string, database: string = `${SolarweaveConfig.database}`) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', database),
-            equals('blockhash', blockhash),
-        ),
-    );
+export async function RetrieveBlockhash(solanaBlockhash: string, database: string = `${SolarweaveConfig.database}`) {
+    const query = `query {
+        transactions(
+            first: 1,
+            tags: [
+                { name: "database", values: ["${database}"] }
+                { name: "blockhash", values: ["${solanaBlockhash}"] }
+            ]
+        ) {
+            edges {
+                cursor
+                node {
+                    id
+                    tags {
+                        name
+                        value
+                    }
+                }
+            }
+        }
+    }`;
 
-    if (txs.length > 0) {
-        const data = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-        return await ParsePayload(data);
+    const edges = await GraphQL(query);
+
+    if (edges.length > 0) {
+        const BlockData = await RetrieveBlock(edges[0].node.id);
+        const Tags = edges[0].node.tags;
+
+        return { BlockData: JSON.parse(BlockData), Tags };
     } else {
         return null;
-    }
+    } 
 }
 
-export async function RetrieveBlockBySignature(signature: string, database: string = `${SolarweaveConfig.database}-index`) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', database),
-            equals('signature', signature),
-        ),
-    );
+export async function RetrieveSignature(solanaSignature: string, database: string = `${SolarweaveConfig.database}`) {
+    const query = `query {
+        transactions(
+            first: 1,
+            tags: [
+                { name: "database", values: ["${database}"] }
+                { name: "defaultSignature", values: ["${solanaSignature}"] }
+            ]
+        ) {
+            edges {
+                cursor
+                node {
+                    id
+                    tags {
+                        name
+                        value
+                    }
+                }
+            }
+        }
+    }`;
 
-    if (txs.length > 0) {
-        const blockhash = await arweave.transactions.getData(txs[0], { decode: true, string: true });
-        return await RetrieveBlockByBlockhash(blockhash);
+    const edges = await GraphQL(query);
+
+    if (edges.length > 0) {
+        const BlockData = await RetrieveBlock(edges[0].node.id);
+        const Tags = edges[0].node.tags;
+
+        return { BlockData: JSON.parse(BlockData), Tags };
     } else {
         return null;
-    }
+    } 
 }
 
-export async function RetrieveBlocksFromAccount(accountKey: string, database: string = `${SolarweaveConfig.database}-index`) {
-    const txs = await arweave.arql(
-        and(
-            equals('database', database),
-            equals('accountKey', accountKey),
-        ),
-    );
+export async function RetrieveAccount(accountKey: string, first: number = 25, after?: string, database: string = `${SolarweaveConfig.database}-index`) {
+    const query = `query {
+        transactions(
+            first: ${first},
+            ${after ? `after: "${after}"` : ``},
+            tags: [
+                { name: "database", values: ["${database}"] },
+                { name: "accountKey", values: ["${accountKey}"] }
+            ],
+            sort: HEIGHT_DESC
+        ) {
+            edges {
+                cursor
+                node {
+                    id
+                    tags {
+                        name
+                        value
+                    }
+                }
+            }
+        }
+    }`;
 
-    return txs;
-}
-
-export async function RetrieveBlockData(arweaveTxId: string) {
-    const data = {
-        database: '',
-        slot: '',
-        parentSlot: '',
-        accountKey: '',
-        blockhash: '',
-        defaultSignature: '',
-    };
-
-    const metadata = await arweave.transactions.get(arweaveTxId);
-
-    metadata.get('tags').forEach(tag => {
-        const key = tag.get('name', { decode: true, string: true });
-        const value = tag.get('value', { decode: true, string: true });
-
-        data[key] = value;
-    });
-
-    return data;
+    return await GraphQL(query);
 }

@@ -36,45 +36,54 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.arweave = void 0;
-var Arweave = require("arweave");
 var assert_1 = require("assert");
-var arql_ops_1 = require("arql-ops");
-exports.arweave = Arweave.init({
-    host: 'arweave.net',
-    port: 443,
-    protocol: 'https',
-    timeout: 20000,
-    logging: false,
-});
+var ARQL_service_1 = require("../src/service/ARQL.service");
 describe('ARQL Tests', function () {
-    var block = '1025219';
-    it('Should retrieve Block #1025219 from the database', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var txs, dataString;
+    it('Should be able to run a basic GraphQL Query', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var Edges;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.arweave.arql(arql_ops_1.and(arql_ops_1.equals('database', 'solarweave-devnet'), arql_ops_1.equals('slot', block)))];
+                case 0: return [4 /*yield*/, ARQL_service_1.GraphQL("query {\n            transactions {\n                edges {\n                    cursor \n                    node {\n                        id\n                    }\n                }\n            }\n        }")];
                 case 1:
-                    txs = _a.sent();
-                    return [4 /*yield*/, exports.arweave.transactions.getData(txs[0], { decode: true, string: true })];
-                case 2:
-                    dataString = _a.sent();
-                    assert_1.equal(typeof dataString, 'string');
+                    Edges = _a.sent();
+                    console.log(Edges);
+                    assert_1.equal(Edges !== null, true);
                     return [2 /*return*/];
             }
         });
     }); });
-    it('Should retrieve the first block found from the Solarweave Database', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var txs, dataString;
+    it('Should be able to retrieve entries from the Vote Account', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var Edges;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.arweave.arql(arql_ops_1.and(arql_ops_1.equals('database', 'solarweave-devnet')))];
+                case 0: return [4 /*yield*/, ARQL_service_1.RetrieveAccount('Vote111111111111111111111111111111111111111', 3, '', 'solarweave-cache-devnet-testrun1-index')];
                 case 1:
-                    txs = _a.sent();
-                    return [4 /*yield*/, exports.arweave.transactions.getData(txs[0], { decode: true, string: true })];
-                case 2:
-                    dataString = _a.sent();
-                    assert_1.equal(typeof dataString, 'string');
+                    Edges = _a.sent();
+                    assert_1.equal(Edges.length === 3, true);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('Should be able to retrieve latest entries from the database', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var Edges;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, ARQL_service_1.RetrieveBlocks(3, '', 'solarweave-cache-devnet-testrun1')];
+                case 1:
+                    Edges = _a.sent();
+                    assert_1.equal(Edges.length === 3, true);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('Should be able to retrieve actual block data', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var BlockData;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, ARQL_service_1.RetrieveBlock('AXhCf_ARKlIEmpvQaRSXnbAuVh0KRxG5B1ybZP0mhMM')];
+                case 1:
+                    BlockData = _a.sent();
+                    assert_1.equal(BlockData !== null, true);
                     return [2 /*return*/];
             }
         });

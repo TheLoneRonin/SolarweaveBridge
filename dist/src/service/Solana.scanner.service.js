@@ -85,7 +85,7 @@ function AddBlockToCache(Block, Slot) {
                     return [3 /*break*/, 5];
                 case 1:
                     if (!Config_1.SolarweaveConfig.verify) return [3 /*break*/, 3];
-                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockByBlockhash(Block.blockhash)];
+                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockhash(Block.blockhash)];
                 case 2:
                     if (_a.sent()) {
                         return [2 /*return*/, (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached").yellow)];

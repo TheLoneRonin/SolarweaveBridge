@@ -21,6 +21,7 @@ export const arweave = Arweave.init ?
 export let SolarweaveConfig: SolarweaveInterface = {
     rpc_version: `2.0`,
     database: 'solarweave-devnet',
+    arweaveGraphQL: 'https://arweave.dev/graphql',
     url: `https://devnet.solana.com`,
     credentials: `.arweave.creds.json`,
     local: false,
@@ -35,6 +36,7 @@ export let SolarweaveConfig: SolarweaveInterface = {
 export function UpdateConfig(
     rpc_version: string,
     database: string,
+    arweaveGraphQL: string,
     url: string,
     credentials: string,
     local: boolean,
@@ -48,6 +50,7 @@ export function UpdateConfig(
     SolarweaveConfig = {
         database,
         rpc_version,
+        arweaveGraphQL,
         url,
         credentials,
         local,

@@ -3,7 +3,6 @@ import { equal } from 'assert';
 import { SolarweaveConfig } from '../src/Config';
 import { ArweaveTransaction } from '../src/interface/Arweave.interface';
 import { LoadWallet, GetBalance, SubmitBlockToArweave, CreateBlockIndices } from '../src/service/Arweave.service';
-import { RetrieveBlockBySlot, RetrieveBlockByBlockhash } from '../src/service/ARQL.service';
 
 export const arweave = Arweave.init({
     host: 'arweave.net',
@@ -65,19 +64,6 @@ describe('Arweave Service Tests', () => {
         equal(Number(balance) > -1, true);
     });
 
-    it('Should retrieve a block by slot number', async () => {
-        const Block = await RetrieveBlockBySlot(slot);
-        SampleBlock = JSON.parse(Block);
-
-        equal(Block !== null, true);
-    });
-
-    it('Should retrieve a block by blockhash', async () => {
-        const Block = await RetrieveBlockByBlockhash(blockhash);
-        
-        equal(Block !== null, true);
-    });
-
     it('Should create the appropriate block indices for a new transaction', async () => {
         equal(SampleBlock !== null, true);
         console.log('Sample Block', SampleBlock);
@@ -88,7 +74,7 @@ describe('Arweave Service Tests', () => {
         const transaction: ArweaveTransaction = PrepareTransaction(SampleBlock, slot);
 
         let tx = await arweave.createTransaction({ data: JSON.stringify(SampleBlock) }, key);
-        await CreateBlockIndices(key, transaction);
+        await CreateBlockIndices(key, transaction, JSON.stringify(SampleBlock));
     });
 
     it('Should submit a block to Arweave', async () => {

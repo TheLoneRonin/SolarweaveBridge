@@ -5,4 +5,4 @@ export declare function GetBalance(): Promise<{
     balance: any;
 }>;
 export declare function SubmitBlockToArweave(transaction: ArweaveTransaction): Promise<boolean>;
-export declare function CreateBlockIndices(key: any, transaction: ArweaveTransaction): Promise<void>;
+export declare function CreateBlockIndices(key: any, transaction: ArweaveTransaction, data: string): Promise<void>;

@@ -9,6 +9,7 @@ describe('Config Tests', () => {
     it('Verify the contents of Solarweave Config', () => {
         equal(SolarweaveConfig.rpc_version, '2.0');
         equal(SolarweaveConfig.database, 'solarweave-devnet');
+        equal(SolarweaveConfig.arweaveGraphQL, 'https://arweave.dev/graphql');
         equal(SolarweaveConfig.url, 'https://devnet.solana.com');
         equal(SolarweaveConfig.credentials, '.arweave.creds.json');
         equal(SolarweaveConfig.local, false);
@@ -24,6 +25,7 @@ describe('Config Tests', () => {
         UpdateConfig(
             '2.0',
             'solarweave-devnet',
+            'https://arweave.dev/graphql',
             'https://devnet.solana.com',
             '.arweave.creds.json',
             false,
