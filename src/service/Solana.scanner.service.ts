@@ -5,7 +5,7 @@ import { Log } from '../util/Log.util';
 import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { SubmitBlockToArweave } from './Arweave.service';
-import { RetrieveBlockByBlockhash } from './ARQL.service';
+import { RetrieveBlockhash } from './ARQL.service';
 import { GetSlot, GetBlock } from './Solana.rpc.service';
 
 export async function GetLatestBlock() {
@@ -37,7 +37,7 @@ export async function AddBlockToCache(Block, Slot: number): Promise<string> {
             Log(`Block Hash: `.green + `${Block.blockhash}\n`.green.bold);    
         } else {
             if (SolarweaveConfig.verify) {
-                if (await RetrieveBlockByBlockhash(Block.blockhash)) {
+                if (await RetrieveBlockhash(Block.blockhash)) {
                     return (`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
                 }
             }

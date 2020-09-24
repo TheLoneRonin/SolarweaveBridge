@@ -40,7 +40,6 @@ exports.CreateBlockIndices = exports.SubmitBlockToArweave = exports.GetBalance =
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
-var Bound_util_1 = require("../util/Bound.util");
 var Compression_service_1 = require("../service/Compression.service");
 function LoadWallet() {
     return __awaiter(this, void 0, void 0, function () {
@@ -98,8 +97,6 @@ function SubmitBlockToArweave(transaction) {
                     tx.addTag('slot', transaction.tags.slot);
                     tx.addTag('blockhash', transaction.tags.blockhash);
                     tx.addTag('compressed', Config_1.SolarweaveConfig.compressed ? 'true' : 'false');
-                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
-                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
                     for (i = 0; i < transaction.tags.transactions.length; i++) {
                         solTx = transaction.tags.transactions[i];
                         tx.addTag("tx-" + i + "-numReadonlySignedAccounts", solTx.numReadonlySignedAccounts.toString());
@@ -115,7 +112,7 @@ function SubmitBlockToArweave(transaction) {
                             tx.addTag("tx-" + i + "-programIdIndex-" + ii, solTx.programIdIndex[ii].toString());
                         }
                     }
-                    return [4 /*yield*/, CreateBlockIndices(key, transaction)];
+                    return [4 /*yield*/, CreateBlockIndices(key, transaction, data)];
                 case 6:
                     _b.sent();
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
@@ -132,9 +129,9 @@ function SubmitBlockToArweave(transaction) {
     });
 }
 exports.SubmitBlockToArweave = SubmitBlockToArweave;
-function CreateBlockIndices(key, transaction) {
+function CreateBlockIndices(key, transaction, data) {
     return __awaiter(this, void 0, void 0, function () {
-        var blockhash, signatures, accountKeys, i, solTx, ii, ii, defaultSignature, i, tx, i, tx;
+        var blockhash, signatures, accountKeys, i, solTx, ii, ii, defaultSignature, i, tx;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -161,17 +158,16 @@ function CreateBlockIndices(key, transaction) {
                     i = 0;
                     _a.label = 1;
                 case 1:
-                    if (!(i < signatures.length)) return [3 /*break*/, 6];
-                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: blockhash }, key)];
+                    if (!(i < accountKeys.length)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: data }, key)];
                 case 2:
                     tx = _a.sent();
                     tx.addTag('database', transaction.tags.database + "-index");
-                    tx.addTag('signature', signatures[i]);
+                    tx.addTag('accountKey', accountKeys[i]);
+                    tx.addTag('defaultSignature', defaultSignature);
                     tx.addTag('parentSlot', transaction.tags.parentSlot);
                     tx.addTag('slot', transaction.tags.slot);
-                    tx.addTag('blockhash', transaction.tags.blockhash);
-                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
-                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
+                    tx.addTag('blockhash', blockhash);
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
                 case 3:
                     _a.sent();
@@ -182,33 +178,7 @@ function CreateBlockIndices(key, transaction) {
                 case 5:
                     i++;
                     return [3 /*break*/, 1];
-                case 6:
-                    i = 0;
-                    _a.label = 7;
-                case 7:
-                    if (!(i < accountKeys.length)) return [3 /*break*/, 12];
-                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: blockhash }, key)];
-                case 8:
-                    tx = _a.sent();
-                    tx.addTag('database', transaction.tags.database + "-index");
-                    tx.addTag('accountKey', accountKeys[i]);
-                    tx.addTag('defaultSignature', defaultSignature);
-                    tx.addTag('parentSlot', transaction.tags.parentSlot);
-                    tx.addTag('slot', transaction.tags.slot);
-                    tx.addTag('blockhash', transaction.tags.blockhash);
-                    tx.addTag('lowerbound', Bound_util_1.DetermineLowerbound(Number(transaction.tags.slot)).toString());
-                    tx.addTag('upperbound', Bound_util_1.DetermineUpperbound(Number(transaction.tags.slot)).toString());
-                    return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
-                case 9:
-                    _a.sent();
-                    return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
-                case 10:
-                    _a.sent();
-                    _a.label = 11;
-                case 11:
-                    i++;
-                    return [3 /*break*/, 7];
-                case 12: return [2 /*return*/];
+                case 6: return [2 /*return*/];
             }
         });
     });

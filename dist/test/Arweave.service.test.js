@@ -41,7 +41,6 @@ var Arweave = require("arweave");
 var assert_1 = require("assert");
 var Config_1 = require("../src/Config");
 var Arweave_service_1 = require("../src/service/Arweave.service");
-var ARQL_service_1 = require("../src/service/ARQL.service");
 exports.arweave = Arweave.init({
     host: 'arweave.net',
     port: 443,
@@ -104,31 +103,6 @@ describe('Arweave Service Tests', function () {
             }
         });
     }); });
-    it('Should retrieve a block by slot number', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var Block;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, ARQL_service_1.RetrieveBlockBySlot(slot)];
-                case 1:
-                    Block = _a.sent();
-                    SampleBlock = JSON.parse(Block);
-                    assert_1.equal(Block !== null, true);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('Should retrieve a block by blockhash', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var Block;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, ARQL_service_1.RetrieveBlockByBlockhash(blockhash)];
-                case 1:
-                    Block = _a.sent();
-                    assert_1.equal(Block !== null, true);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
     it('Should create the appropriate block indices for a new transaction', function () { return __awaiter(void 0, void 0, void 0, function () {
         var key, transaction, tx;
         return __generator(this, function (_a) {
@@ -144,7 +118,7 @@ describe('Arweave Service Tests', function () {
                     return [4 /*yield*/, exports.arweave.createTransaction({ data: JSON.stringify(SampleBlock) }, key)];
                 case 2:
                     tx = _a.sent();
-                    return [4 /*yield*/, Arweave_service_1.CreateBlockIndices(key, transaction)];
+                    return [4 /*yield*/, Arweave_service_1.CreateBlockIndices(key, transaction, JSON.stringify(SampleBlock))];
                 case 3:
                     _a.sent();
                     return [2 /*return*/];
