@@ -6,6 +6,10 @@ export declare function RetrieveBlockhash(solanaBlockhash: string, database?: st
     BlockData: any;
     Tags: any;
 }>;
+export declare function RetrieveSlot(solanaSlot: string, database?: string): Promise<{
+    BlockData: any;
+    Tags: any;
+}>;
 export declare function RetrieveSignature(solanaSignature: string, database?: string): Promise<{
     BlockData: any;
     Tags: any;

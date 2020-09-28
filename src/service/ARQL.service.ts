@@ -97,6 +97,40 @@ export async function RetrieveBlockhash(solanaBlockhash: string, database: strin
     } 
 }
 
+export async function RetrieveSlot(solanaSlot: string, database: string = `${SolarweaveConfig.database}`) {
+    const query = `query {
+        transactions(
+            first: 1,
+            tags: [
+                { name: "database", values: ["${database}"] }
+                { name: "slot", values: ["${solanaSlot}"] }
+            ]
+        ) {
+            edges {
+                cursor
+                node {
+                    id
+                    tags {
+                        name
+                        value
+                    }
+                }
+            }
+        }
+    }`;
+
+    const edges = await GraphQL(query);
+
+    if (edges.length > 0) {
+        const BlockData = await RetrieveBlock(edges[0].node.id);
+        const Tags = edges[0].node.tags;
+
+        return { BlockData: JSON.parse(BlockData), Tags };
+    } else {
+        return null;
+    } 
+}
+
 export async function RetrieveSignature(solanaSignature: string, database: string = `${SolarweaveConfig.database}`) {
     const query = `query {
         transactions(

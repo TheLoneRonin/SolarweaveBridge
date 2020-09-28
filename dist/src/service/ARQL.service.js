@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RetrieveAccount = exports.RetrieveSignature = exports.RetrieveBlockhash = exports.RetrieveBlock = exports.RetrieveBlocks = exports.GraphQL = exports.ParsePayload = void 0;
+exports.RetrieveAccount = exports.RetrieveSignature = exports.RetrieveSlot = exports.RetrieveBlockhash = exports.RetrieveBlock = exports.RetrieveBlocks = exports.GraphQL = exports.ParsePayload = void 0;
 var superagent_1 = require("superagent");
 var Config_1 = require("../Config");
 var Compression_service_1 = require("../service/Compression.service");
@@ -136,6 +136,29 @@ function RetrieveBlockhash(solanaBlockhash, database) {
     });
 }
 exports.RetrieveBlockhash = RetrieveBlockhash;
+function RetrieveSlot(solanaSlot, database) {
+    if (database === void 0) { database = "" + Config_1.SolarweaveConfig.database; }
+    return __awaiter(this, void 0, void 0, function () {
+        var query, edges, BlockData, Tags;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    query = "query {\n        transactions(\n            first: 1,\n            tags: [\n                { name: \"database\", values: [\"" + database + "\"] }\n                { name: \"slot\", values: [\"" + solanaSlot + "\"] }\n            ]\n        ) {\n            edges {\n                cursor\n                node {\n                    id\n                    tags {\n                        name\n                        value\n                    }\n                }\n            }\n        }\n    }";
+                    return [4 /*yield*/, GraphQL(query)];
+                case 1:
+                    edges = _a.sent();
+                    if (!(edges.length > 0)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, RetrieveBlock(edges[0].node.id)];
+                case 2:
+                    BlockData = _a.sent();
+                    Tags = edges[0].node.tags;
+                    return [2 /*return*/, { BlockData: JSON.parse(BlockData), Tags: Tags }];
+                case 3: return [2 /*return*/, null];
+            }
+        });
+    });
+}
+exports.RetrieveSlot = RetrieveSlot;
 function RetrieveSignature(solanaSignature, database) {
     if (database === void 0) { database = "" + Config_1.SolarweaveConfig.database; }
     return __awaiter(this, void 0, void 0, function () {
