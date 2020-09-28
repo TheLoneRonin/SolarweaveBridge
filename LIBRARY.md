@@ -35,7 +35,7 @@ const solarweave = require('@theronin/solarweave');
 **Type Definition**:
 
 ```typescript
-function GraphQL(query: string): Promise<ArweaveBlock>
+function GraphQL(query: string): Promise<ArweaveBlock[]>
 ```
 
 Run a GraphQL
@@ -68,7 +68,7 @@ console.log(Transactions);
 **Type Definition**:
 
 ```typescript
-function RetrieveBlocks(first?: number, after?: string, database?: string): Promise<ArweaveBlock>
+function RetrieveBlocks(first?: number, after?: string, database?: string): Promise<ArweaveBlock[]>
 ```
 
 **Example Usage**:
@@ -123,6 +123,27 @@ if (BlockData) {
 }
 ```
 
+#### `RetrieveSlot`
+
+**Type Definition**:
+
+```typescript
+function RetrieveSlot(solanaSlot: string, database?: string): Promise<SolanaBlock>
+```
+
+**Example Usage**:
+
+```typescript
+import { RetrieveBlockhash } from '@theronin/solarweave';
+
+const BlockData = await RetrieveBlockhash('1025672');
+
+if (BlockData) {
+    const Block = JSON.parse(BlockData);
+    console.log(Block);
+}
+```
+
 #### `RetrieveSignature`
 
 **Type Definition**:
@@ -149,7 +170,7 @@ if (BlockData) {
 **Type Definition**:
 
 ```typescript
-function RetrieveAccount(accountKey: string, first?: number, after?: string, database?: string): Promise<ArweaveBlock>
+function RetrieveAccount(accountKey: string, first?: number, after?: string, database?: string): Promise<ArweaveBlock[]>
 ```
 
 **Example Usage**:
