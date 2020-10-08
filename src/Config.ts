@@ -1,22 +1,22 @@
-const Arweave = require('arweave');
+import Arweave from 'arweave/node';
+import deepHash from 'arweave/node/lib/deepHash';
+import ArweaveData from './ArweaveData';
+
 import { SolarweaveInterface } from './interface/Solarweave.interface';
 
-export const arweave = Arweave.init ?
-    Arweave.init({
-        host: 'arweave.net',
-        port: 443,
-        protocol: 'https',
-        timeout: 20000,
-        logging: false,
-    })
-    :
-    Arweave.default.init({
-        host: 'arweave.net',
-        port: 443,
-        protocol: 'https',
-        timeout: 20000,
-        logging: false,
-    });
+export const arweave = Arweave.init({
+    host: 'arweave.net',
+    port: 443,
+    protocol: 'https',
+    timeout: 20000,
+    logging: false,
+});
+
+export const ArData = ArweaveData({
+    utils: Arweave.utils,
+    crypto: Arweave.crypto,
+    deepHash,
+})
 
 export let SolarweaveConfig: SolarweaveInterface = {
     rpc_version: `2.0`,

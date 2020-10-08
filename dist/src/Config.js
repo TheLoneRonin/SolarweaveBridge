@@ -1,23 +1,24 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateConfig = exports.SolarweaveConfig = exports.arweave = void 0;
-var Arweave = require('arweave');
-exports.arweave = Arweave.init ?
-    Arweave.init({
-        host: 'arweave.net',
-        port: 443,
-        protocol: 'https',
-        timeout: 20000,
-        logging: false,
-    })
-    :
-        Arweave.default.init({
-            host: 'arweave.net',
-            port: 443,
-            protocol: 'https',
-            timeout: 20000,
-            logging: false,
-        });
+exports.UpdateConfig = exports.SolarweaveConfig = exports.ArData = exports.arweave = void 0;
+var node_1 = __importDefault(require("arweave/node"));
+var deepHash_1 = __importDefault(require("arweave/node/lib/deepHash"));
+var ArweaveData_1 = __importDefault(require("./ArweaveData"));
+exports.arweave = node_1.default.init({
+    host: 'arweave.net',
+    port: 443,
+    protocol: 'https',
+    timeout: 20000,
+    logging: false,
+});
+exports.ArData = ArweaveData_1.default({
+    utils: node_1.default.utils,
+    crypto: node_1.default.crypto,
+    deepHash: deepHash_1.default,
+});
 exports.SolarweaveConfig = {
     rpc_version: "2.0",
     database: 'solarweave-devnet',

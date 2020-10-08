@@ -1,10 +1,12 @@
+import Transaction from 'arweave/node/lib/transaction';
 import { read } from 'fs-jetpack';
 
-import { SolarweaveConfig, arweave } from '../Config';
+import { SolarweaveConfig, arweave, ArData } from '../Config';
 import { Log } from '../util/Log.util';
-import { DetermineLowerbound, DetermineUpperbound } from '../util/Bound.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { CompressBlock } from '../service/Compression.service';
+
+export const NONCE = `170A240D55E8D4A96647180DEE407C28D5388DF5653895859B4C76B6D5D99DD7`;
 
 export async function LoadWallet() {
     const key = JSON.parse(read(SolarweaveConfig.credentials));
@@ -22,38 +24,21 @@ export async function GetBalance() {
 
 export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
     const key = await LoadWallet();
-    const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(transaction.payload)) : JSON.stringify(transaction.payload);
+
+    const bundle = await BundleItem(transaction, key);
+    const bundles = await BundleIndices(transaction, key);
+    bundles.push(bundle);
+
+    const data: Transaction[] = await ArData.bundleData(bundles);
 
     let tx = await arweave.createTransaction({ data }, key);
 
-    tx.addTag('database', transaction.tags.database);
+    tx.addTag('Bundle-Type', 'ANS-102');
+    tx.addTag('Bundle-Format', 'json');
+    tx.addTag('Bundle-Version', '1.0.0');
+    tx.addTag('Content-Type', 'application/json');
+    tx.addTag('database', SolarweaveConfig.database);
 
-    tx.addTag('parentSlot', transaction.tags.parentSlot);
-    tx.addTag('slot', transaction.tags.slot);
-    tx.addTag('blockhash', transaction.tags.blockhash);
-    tx.addTag('compressed', SolarweaveConfig.compressed ? 'true' : 'false');
-
-    for (let i = 0; i < transaction.tags.transactions.length; i++) {
-        const solTx = transaction.tags.transactions[i];
-
-        tx.addTag(`tx-${i}-numReadonlySignedAccounts`, solTx.numReadonlySignedAccounts.toString());
-        tx.addTag(`tx-${i}-numReadonlyUnsignedAccounts`, solTx.numReadonlyUnsignedAccounts.toString());
-        tx.addTag(`tx-${i}-numRequiredSignatures`, solTx.numRequiredSignatures.toString());
-    
-        for (let ii = 0; ii < solTx.signatures.length; ii++) {
-            tx.addTag(`tx-${i}-signature-${ii}`, solTx.signatures[ii]);
-        }
-    
-        for (let ii = 0; ii < solTx.accountKeys.length; ii++) {
-            tx.addTag(`tx-${i}-accountKey-${ii}`, solTx.accountKeys[ii]);
-        }
-        
-        for (let ii = 0; ii < solTx.programIdIndex.length; ii++) {
-            tx.addTag(`tx-${i}-programIdIndex-${ii}`, solTx.programIdIndex[ii].toString());
-        }
-    } 
-
-    await CreateBlockIndices(key, transaction, data);
     await arweave.transactions.sign(tx, key);
     await arweave.transactions.post(tx);
 
@@ -63,7 +48,61 @@ export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
     return true;
 }
 
-export async function CreateBlockIndices(key, transaction: ArweaveTransaction, data: string) {
+export async function BundleItem(transaction: ArweaveTransaction, key) {
+    const address = await arweave.wallets.jwkToAddress(key);
+    const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(transaction.payload)) : JSON.stringify(transaction.payload);
+
+    const tags = [
+        { name: 'database', value: transaction.tags.database },
+        { name: 'parentSlot', value: transaction.tags.parentSlot },
+        { name: 'slot', value: transaction.tags.slot },
+        { name: 'blockhash', value: transaction.tags.blockhash },
+        { name: 'compressed', value: SolarweaveConfig.compressed ? 'true' : 'false' },
+    ];
+
+    for (let i = 0; i < transaction.tags.transactions.length; i++) {
+        const solTx = transaction.tags.transactions[i];
+
+        tags.push({ name: `tx-${i}-numReadonlySignedAccounts`, value: solTx.numReadonlySignedAccounts.toString() });
+        tags.push({ name: `tx-${i}-numReadonlyUnsignedAccounts`, value: solTx.numReadonlyUnsignedAccounts.toString() });
+        tags.push({ name: `tx-${i}-numRequiredSignatures`, value: solTx.numRequiredSignatures.toString() });
+    
+        for (let ii = 0; ii < solTx.signatures.length; ii++) {
+            tags.push({ name: `tx-${i}-signature-${ii}`, value: solTx.signatures[ii] });
+        }
+    
+        for (let ii = 0; ii < solTx.accountKeys.length; ii++) {
+            tags.push({ name: `tx-${i}-accountKey-${ii}`, value: solTx.accountKeys[ii] });
+        }
+        
+        for (let ii = 0; ii < solTx.programIdIndex.length; ii++) {
+            tags.push({ name: `tx-${i}-programIdIndex-${ii}`, value: solTx.programIdIndex[ii].toString() });
+        }
+    }
+
+    const bundle: Transaction = await ArData.createData({
+        data,
+        tags,
+        nonce: NONCE,
+        target: address,
+    }, key);
+
+    return await ArData.sign(bundle, key);
+}
+
+export async function BundleIndices(transaction: ArweaveTransaction, key) {
+    const items = [];
+    const address = await arweave.wallets.jwkToAddress(key);
+    const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(transaction.payload)) : JSON.stringify(transaction.payload);
+
+    const tags = [
+        { name: 'database', value: transaction.tags.database },
+        { name: 'parentSlot', value: transaction.tags.parentSlot },
+        { name: 'slot', value: transaction.tags.slot },
+        { name: 'blockhash', value: transaction.tags.blockhash },
+        { name: 'compressed', value: SolarweaveConfig.compressed ? 'true' : 'false' },
+    ];
+
     const blockhash = transaction.tags.blockhash;
     const signatures = [];
     const accountKeys = [];
@@ -91,16 +130,22 @@ export async function CreateBlockIndices(key, transaction: ArweaveTransaction, d
     }
 
     for (let i = 0; i < accountKeys.length; i++) {
-        const tx = await arweave.createTransaction({ data }, key);
+        const IndexTags = tags;
 
-        tx.addTag('database', `${transaction.tags.database}-index`);
-        tx.addTag('accountKey', accountKeys[i]);
-        tx.addTag('defaultSignature', defaultSignature);
-        tx.addTag('parentSlot', transaction.tags.parentSlot);
-        tx.addTag('slot', transaction.tags.slot);
-        tx.addTag('blockhash', blockhash);
+        IndexTags.push({ name: 'accountKey', value: accountKeys[i] });
+        IndexTags.push({ name: 'defaultSignature', value: defaultSignature });
 
-        await arweave.transactions.sign(tx, key);
-        await arweave.transactions.post(tx);
+        const bundle = await ArData.createData({
+            data,
+            tags: IndexTags,
+            nonce: NONCE,
+            target: address,
+        }, key);
+
+        const signedBundle = await ArData.sign(bundle, key);
+
+        items.push(signedBundle);
     }
+
+    return items;
 }
