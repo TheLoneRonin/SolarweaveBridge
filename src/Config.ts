@@ -1,6 +1,6 @@
 import Arweave from 'arweave/node';
 import deepHash from 'arweave/node/lib/deepHash';
-import ArweaveData from './ArweaveData';
+import ArweaveData from 'arweave-bundles';
 
 import { SolarweaveInterface } from './interface/Solarweave.interface';
 

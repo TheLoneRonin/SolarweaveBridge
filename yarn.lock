@@ -334,6 +334,13 @@ array.prototype.map@^1.0.1:
     es-array-method-boxes-properly "^1.0.0"
     is-string "^1.0.4"
 
+arweave-bundles@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/arweave-bundles/-/arweave-bundles-1.0.0.tgz#244d22c58c805ba57804988909066d968c5fa73f"
+  integrity sha512-J0oM/C/+H6CFGmsM+1w0Q0MQSnLUHuEaWpGcHuIe+nMnwEYuTChgT4PGavYZ/HJH5m2XdKxwSJBUDZedJxRuaw==
+  dependencies:
+    arweave "^1.9.1"
+
 arweave@^1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/arweave/-/arweave-1.9.1.tgz#9b3754eeb38a244ed9abf1024ab0df6bfb76a990"

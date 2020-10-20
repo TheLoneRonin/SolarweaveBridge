@@ -36,7 +36,7 @@ export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
         bundles.concat(bundledItem, bundledIndices);
     }
 
-    const data: Transaction[] = await ArData.bundleData(bundles);
+    const data = await ArData.bundleData(bundles);
 
     let tx = await arweave.createTransaction({ data: JSON.stringify(data) }, key);
 
@@ -84,7 +84,7 @@ export async function BundleItem(transaction: ArweaveTransaction, key) {
         }
     }
 
-    const bundle: Transaction = await ArData.createData({
+    const bundle = await ArData.createData({
         data,
         tags,
         nonce: NONCE,

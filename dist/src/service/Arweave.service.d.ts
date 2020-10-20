@@ -6,5 +6,5 @@ export declare function GetBalance(): Promise<{
     balance: string;
 }>;
 export declare function SubmitBlockToArweave(transactions: ArweaveTransaction[]): Promise<boolean>;
-export declare function BundleItem(transaction: ArweaveTransaction, key: any): Promise<any>;
+export declare function BundleItem(transaction: ArweaveTransaction, key: any): Promise<import("arweave-bundles").DataItemJson>;
 export declare function BundleIndices(transaction: ArweaveTransaction, key: any): Promise<any[]>;
