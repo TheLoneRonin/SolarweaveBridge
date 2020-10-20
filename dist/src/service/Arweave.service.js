@@ -36,11 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateBlockIndices = exports.SubmitBlockToArweave = exports.GetBalance = exports.LoadWallet = void 0;
+exports.BundleIndices = exports.BundleItem = exports.SubmitBlockToArweave = exports.GetBalance = exports.LoadWallet = exports.NONCE = void 0;
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
 var Compression_service_1 = require("../service/Compression.service");
+exports.NONCE = "170A240D55E8D4A96647180DEE407C28D5388DF5653895859B4C76B6D5D99DD7";
 function LoadWallet() {
     return __awaiter(this, void 0, void 0, function () {
         var key;
@@ -71,14 +72,62 @@ function GetBalance() {
     });
 }
 exports.GetBalance = GetBalance;
-function SubmitBlockToArweave(transaction) {
+function SubmitBlockToArweave(transactions) {
     return __awaiter(this, void 0, void 0, function () {
-        var key, data, _a, tx, i, solTx, ii, ii, ii;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var key, bundles, i, transaction, bundledItem, bundledIndices, data, tx;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0: return [4 /*yield*/, LoadWallet()];
                 case 1:
-                    key = _b.sent();
+                    key = _a.sent();
+                    bundles = [];
+                    i = 0;
+                    _a.label = 2;
+                case 2:
+                    if (!(i < transactions.length)) return [3 /*break*/, 6];
+                    transaction = transactions[i];
+                    return [4 /*yield*/, BundleItem(transaction, key)];
+                case 3:
+                    bundledItem = _a.sent();
+                    return [4 /*yield*/, BundleIndices(transaction, key)];
+                case 4:
+                    bundledIndices = _a.sent();
+                    bundles.concat(bundledItem, bundledIndices);
+                    _a.label = 5;
+                case 5:
+                    i++;
+                    return [3 /*break*/, 2];
+                case 6: return [4 /*yield*/, Config_1.ArData.bundleData(bundles)];
+                case 7:
+                    data = _a.sent();
+                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: JSON.stringify(data) }, key)];
+                case 8:
+                    tx = _a.sent();
+                    tx.addTag('Bundle-Type', 'ANS-102');
+                    tx.addTag('Bundle-Format', 'json');
+                    tx.addTag('Bundle-Version', '1.0.0');
+                    tx.addTag('Content-Type', 'application/json');
+                    return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
+                case 9:
+                    _a.sent();
+                    return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
+                case 10:
+                    _a.sent();
+                    Log_util_1.Log(("Transmitted Solana Blocks with the Slots " + transactions.map(function (t) { return t.tags.slot; }) + " to Arweave\n").green);
+                    return [2 /*return*/, true];
+            }
+        });
+    });
+}
+exports.SubmitBlockToArweave = SubmitBlockToArweave;
+function BundleItem(transaction, key) {
+    return __awaiter(this, void 0, void 0, function () {
+        var address, data, _a, tags, i, solTx, ii, ii, ii, bundle;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0: return [4 /*yield*/, Config_1.arweave.wallets.jwkToAddress(key)];
+                case 1:
+                    address = _b.sent();
                     if (!Config_1.SolarweaveConfig.compressed) return [3 /*break*/, 3];
                     return [4 /*yield*/, Compression_service_1.CompressBlock(JSON.stringify(transaction.payload))];
                 case 2:
@@ -89,52 +138,70 @@ function SubmitBlockToArweave(transaction) {
                     _b.label = 4;
                 case 4:
                     data = _a;
-                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: data }, key)];
-                case 5:
-                    tx = _b.sent();
-                    tx.addTag('database', transaction.tags.database);
-                    tx.addTag('parentSlot', transaction.tags.parentSlot);
-                    tx.addTag('slot', transaction.tags.slot);
-                    tx.addTag('blockhash', transaction.tags.blockhash);
-                    tx.addTag('compressed', Config_1.SolarweaveConfig.compressed ? 'true' : 'false');
+                    tags = [
+                        { name: 'database', value: transaction.tags.database },
+                        { name: 'parentSlot', value: transaction.tags.parentSlot },
+                        { name: 'slot', value: transaction.tags.slot },
+                        { name: 'blockhash', value: transaction.tags.blockhash },
+                        { name: 'compressed', value: Config_1.SolarweaveConfig.compressed ? 'true' : 'false' },
+                    ];
                     for (i = 0; i < transaction.tags.transactions.length; i++) {
                         solTx = transaction.tags.transactions[i];
-                        tx.addTag("tx-" + i + "-numReadonlySignedAccounts", solTx.numReadonlySignedAccounts.toString());
-                        tx.addTag("tx-" + i + "-numReadonlyUnsignedAccounts", solTx.numReadonlyUnsignedAccounts.toString());
-                        tx.addTag("tx-" + i + "-numRequiredSignatures", solTx.numRequiredSignatures.toString());
+                        tags.push({ name: "tx-" + i + "-numReadonlySignedAccounts", value: solTx.numReadonlySignedAccounts.toString() });
+                        tags.push({ name: "tx-" + i + "-numReadonlyUnsignedAccounts", value: solTx.numReadonlyUnsignedAccounts.toString() });
+                        tags.push({ name: "tx-" + i + "-numRequiredSignatures", value: solTx.numRequiredSignatures.toString() });
                         for (ii = 0; ii < solTx.signatures.length; ii++) {
-                            tx.addTag("tx-" + i + "-signature-" + ii, solTx.signatures[ii]);
+                            tags.push({ name: "tx-" + i + "-signature-" + ii, value: solTx.signatures[ii] });
                         }
                         for (ii = 0; ii < solTx.accountKeys.length; ii++) {
-                            tx.addTag("tx-" + i + "-accountKey-" + ii, solTx.accountKeys[ii]);
+                            tags.push({ name: "tx-" + i + "-accountKey-" + ii, value: solTx.accountKeys[ii] });
                         }
                         for (ii = 0; ii < solTx.programIdIndex.length; ii++) {
-                            tx.addTag("tx-" + i + "-programIdIndex-" + ii, solTx.programIdIndex[ii].toString());
+                            tags.push({ name: "tx-" + i + "-programIdIndex-" + ii, value: solTx.programIdIndex[ii].toString() });
                         }
                     }
-                    return [4 /*yield*/, CreateBlockIndices(key, transaction, data)];
-                case 6:
-                    _b.sent();
-                    return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
-                case 7:
-                    _b.sent();
-                    return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
-                case 8:
-                    _b.sent();
-                    Log_util_1.Log("Transmitted Solana Block to Arweave with Parent Slot ".green + ("#" + transaction.tags.parentSlot).green.bold);
-                    Log_util_1.Log("Solana Block Hash: ".green + (transaction.tags.blockhash + "\n").green.bold);
-                    return [2 /*return*/, true];
+                    return [4 /*yield*/, Config_1.ArData.createData({
+                            data: data,
+                            tags: tags,
+                            nonce: exports.NONCE,
+                            target: address,
+                        }, key)];
+                case 5:
+                    bundle = _b.sent();
+                    return [4 /*yield*/, Config_1.ArData.sign(bundle, key)];
+                case 6: return [2 /*return*/, _b.sent()];
             }
         });
     });
 }
-exports.SubmitBlockToArweave = SubmitBlockToArweave;
-function CreateBlockIndices(key, transaction, data) {
+exports.BundleItem = BundleItem;
+function BundleIndices(transaction, key) {
     return __awaiter(this, void 0, void 0, function () {
-        var blockhash, signatures, accountKeys, i, solTx, ii, ii, defaultSignature, i, tx;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var items, address, data, _a, tags, blockhash, signatures, accountKeys, i, solTx, ii, ii, defaultSignature, i, IndexTags, bundle, signedBundle;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
+                    items = [];
+                    return [4 /*yield*/, Config_1.arweave.wallets.jwkToAddress(key)];
+                case 1:
+                    address = _b.sent();
+                    if (!Config_1.SolarweaveConfig.compressed) return [3 /*break*/, 3];
+                    return [4 /*yield*/, Compression_service_1.CompressBlock(JSON.stringify(transaction.payload))];
+                case 2:
+                    _a = _b.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    _a = JSON.stringify(transaction.payload);
+                    _b.label = 4;
+                case 4:
+                    data = _a;
+                    tags = [
+                        { name: 'database', value: transaction.tags.database + '-index' },
+                        { name: 'parentSlot', value: transaction.tags.parentSlot },
+                        { name: 'slot', value: transaction.tags.slot },
+                        { name: 'blockhash', value: transaction.tags.blockhash },
+                        { name: 'compressed', value: Config_1.SolarweaveConfig.compressed ? 'true' : 'false' },
+                    ];
                     blockhash = transaction.tags.blockhash;
                     signatures = [];
                     accountKeys = [];
@@ -156,32 +223,32 @@ function CreateBlockIndices(key, transaction, data) {
                         defaultSignature = signatures[0];
                     }
                     i = 0;
-                    _a.label = 1;
-                case 1:
-                    if (!(i < accountKeys.length)) return [3 /*break*/, 6];
-                    return [4 /*yield*/, Config_1.arweave.createTransaction({ data: data }, key)];
-                case 2:
-                    tx = _a.sent();
-                    tx.addTag('database', transaction.tags.database + "-index");
-                    tx.addTag('accountKey', accountKeys[i]);
-                    tx.addTag('defaultSignature', defaultSignature);
-                    tx.addTag('parentSlot', transaction.tags.parentSlot);
-                    tx.addTag('slot', transaction.tags.slot);
-                    tx.addTag('blockhash', blockhash);
-                    return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
-                case 3:
-                    _a.sent();
-                    return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
-                case 4:
-                    _a.sent();
-                    _a.label = 5;
+                    _b.label = 5;
                 case 5:
+                    if (!(i < accountKeys.length)) return [3 /*break*/, 9];
+                    IndexTags = tags;
+                    IndexTags.push({ name: 'accountKey', value: accountKeys[i] });
+                    IndexTags.push({ name: 'defaultSignature', value: defaultSignature });
+                    return [4 /*yield*/, Config_1.ArData.createData({
+                            data: data,
+                            tags: IndexTags,
+                            nonce: exports.NONCE,
+                            target: address,
+                        }, key)];
+                case 6:
+                    bundle = _b.sent();
+                    return [4 /*yield*/, Config_1.ArData.sign(bundle, key)];
+                case 7:
+                    signedBundle = _b.sent();
+                    items.push(signedBundle);
+                    _b.label = 8;
+                case 8:
                     i++;
-                    return [3 /*break*/, 1];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 5];
+                case 9: return [2 /*return*/, items];
             }
         });
     });
 }
-exports.CreateBlockIndices = CreateBlockIndices;
+exports.BundleIndices = BundleIndices;
 //# sourceMappingURL=Arweave.service.js.map

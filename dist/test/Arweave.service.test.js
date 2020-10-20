@@ -103,28 +103,6 @@ describe('Arweave Service Tests', function () {
             }
         });
     }); });
-    it('Should create the appropriate block indices for a new transaction', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var key, transaction, tx;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    assert_1.equal(SampleBlock !== null, true);
-                    console.log('Sample Block', SampleBlock);
-                    return [4 /*yield*/, Arweave_service_1.LoadWallet()];
-                case 1:
-                    key = _a.sent();
-                    assert_1.equal(key !== null, true);
-                    transaction = PrepareTransaction(SampleBlock, slot);
-                    return [4 /*yield*/, exports.arweave.createTransaction({ data: JSON.stringify(SampleBlock) }, key)];
-                case 2:
-                    tx = _a.sent();
-                    return [4 /*yield*/, Arweave_service_1.CreateBlockIndices(key, transaction, JSON.stringify(SampleBlock))];
-                case 3:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
     it('Should submit a block to Arweave', function () { return __awaiter(void 0, void 0, void 0, function () {
         var key, transaction;
         return __generator(this, function (_a) {
@@ -136,7 +114,7 @@ describe('Arweave Service Tests', function () {
                     key = _a.sent();
                     assert_1.equal(key !== null, true);
                     transaction = PrepareTransaction(SampleBlock, slot);
-                    return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave(transaction)];
+                    return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave([transaction])];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
