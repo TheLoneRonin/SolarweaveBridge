@@ -2,7 +2,7 @@ import { read, write, remove } from 'fs-jetpack';
 import { Log } from '../util/Log.util';
 import { Sleep } from '../util/Sleep.util';
 import { GetFirstSlot, GetSlot, GetConfirmedBlocks, GetBlock } from '../service/Solana.rpc.service';
-import { CacheBlock } from '../service/Solana.scanner.service';
+import { CacheBlocks } from '../service/Solana.scanner.service';
 import { SolarweaveConfig } from '../Config';
 import { Solarweave } from '../Solarweave';
 
@@ -34,13 +34,13 @@ export async function TraverseBlocks(slot: number) {
 
         if (Slots) {
             for (let i = 0; i < Slots.length; i += SolarweaveConfig.parallelize) {
-                const PromisedBlocks = [];
+                const PromisedSlots = [];
                 
                 for (let j = 0; j < SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
-                    PromisedBlocks.push(CacheBlock(Slots[i + j]));
+                    PromisedSlots.push(Slots[i + j]);
                 }
 
-                await Promise.all(PromisedBlocks);
+                await CacheBlocks(PromisedSlots);
                 
                 lastSlot = Slots[i];
                 write(`.solarweave.temp`, (lastSlot).toString());

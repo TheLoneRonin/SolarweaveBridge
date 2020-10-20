@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CacheBlock = exports.AddBlockToCache = exports.GetLatestBlock = void 0;
+exports.CacheBlocks = exports.AddBlockToCache = exports.GetLatestBlock = void 0;
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
@@ -63,35 +63,50 @@ function GetLatestBlock() {
     });
 }
 exports.GetLatestBlock = GetLatestBlock;
-function AddBlockToCache(Block, Slot) {
+function AddBlockToCache(Blocks) {
     return __awaiter(this, void 0, void 0, function () {
-        var File_1, Data, transaction, i, tx, error_1;
+        var File_1, Data, _loop_1, i, state_1, transactions, i, Block, Slot, transaction, i_1, tx, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 6, , 7]);
+                    _a.trys.push([0, 9, , 10]);
                     if (!Config_1.SolarweaveConfig.local) return [3 /*break*/, 1];
                     File_1 = fs_jetpack_1.read(Config_1.SolarweaveConfig.localFile);
                     Data = File_1 ? JSON.parse(File_1) : [];
-                    if (Config_1.SolarweaveConfig.verify) {
-                        if (Data.filter(function (block) { return block.blockhash === Block.blockhash; }).length > 0) {
-                            return [2 /*return*/, (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached").yellow)];
+                    _loop_1 = function (i) {
+                        var Block = Blocks[i].Block;
+                        if (Config_1.SolarweaveConfig.verify) {
+                            if (Data.filter(function (block) { return block.blockhash === Block.blockhash; }).length > 0) {
+                                return { value: (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached").yellow) };
+                            }
                         }
+                        Data.unshift(Block);
+                        fs_jetpack_1.write(Config_1.SolarweaveConfig.localFile, JSON.stringify(Data, null, 2));
+                        Log_util_1.Log("Locally Cached Solana Block with Parent Slot ".green + ("#" + Block.parentSlot).green.bold);
+                        Log_util_1.Log("Block Hash: ".green + (Block.blockhash + "\n").green.bold);
+                    };
+                    for (i = 0; i < Blocks.length; i++) {
+                        state_1 = _loop_1(i);
+                        if (typeof state_1 === "object")
+                            return [2 /*return*/, state_1.value];
                     }
-                    Data.unshift(Block);
-                    fs_jetpack_1.write(Config_1.SolarweaveConfig.localFile, JSON.stringify(Data, null, 2));
-                    Log_util_1.Log("Locally Cached Solana Block with Parent Slot ".green + ("#" + Block.parentSlot).green.bold);
-                    Log_util_1.Log("Block Hash: ".green + (Block.blockhash + "\n").green.bold);
-                    return [3 /*break*/, 5];
+                    return [3 /*break*/, 8];
                 case 1:
-                    if (!Config_1.SolarweaveConfig.verify) return [3 /*break*/, 3];
-                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockhash(Block.blockhash)];
+                    transactions = [];
+                    i = 0;
+                    _a.label = 2;
                 case 2:
+                    if (!(i < Blocks.length)) return [3 /*break*/, 6];
+                    Block = Blocks[i].Block;
+                    Slot = Blocks[i].Slot;
+                    if (!Config_1.SolarweaveConfig.verify) return [3 /*break*/, 4];
+                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockhash(Block.blockhash)];
+                case 3:
                     if (_a.sent()) {
                         return [2 /*return*/, (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached").yellow)];
                     }
-                    _a.label = 3;
-                case 3:
+                    _a.label = 4;
+                case 4:
                     transaction = {
                         tags: {
                             database: Config_1.SolarweaveConfig.database,
@@ -102,8 +117,8 @@ function AddBlockToCache(Block, Slot) {
                         },
                         payload: Block,
                     };
-                    for (i = 0; i < Block.transactions.length; i++) {
-                        tx = Block.transactions[i];
+                    for (i_1 = 0; i_1 < Block.transactions.length; i_1++) {
+                        tx = Block.transactions[i_1];
                         transaction.tags.transactions.push({
                             signatures: tx.transaction.signatures,
                             accountKeys: tx.transaction.message.accountKeys,
@@ -113,50 +128,69 @@ function AddBlockToCache(Block, Slot) {
                             numRequiredSignatures: tx.transaction.message.header.numRequiredSignatures,
                         });
                     }
-                    return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave(transaction)];
-                case 4:
-                    _a.sent();
+                    transactions.push(transaction);
                     _a.label = 5;
                 case 5:
+                    i++;
+                    return [3 /*break*/, 2];
+                case 6: return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave(transactions)];
+                case 7:
+                    _a.sent();
+                    _a.label = 8;
+                case 8:
                     Benchmark_util_1.LogBenchmark('cache_block');
                     return [2 /*return*/, null];
-                case 6:
+                case 9:
                     error_1 = _a.sent();
                     return [2 /*return*/, (error_1.message)];
-                case 7: return [2 /*return*/];
+                case 10: return [2 /*return*/];
             }
         });
     });
 }
 exports.AddBlockToCache = AddBlockToCache;
-function CacheBlock(Slot) {
+function CacheBlocks(Slots) {
     return __awaiter(this, void 0, void 0, function () {
-        var blockPayload, Block, Error_1;
+        var Blocks, i, Slot, blockPayload, Block, Error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Solana_rpc_service_1.GetBlock(Slot)];
+                case 0:
+                    Blocks = [];
+                    i = 0;
+                    _a.label = 1;
                 case 1:
+                    if (!(i < Slots.length)) return [3 /*break*/, 4];
+                    Slot = Slots[i];
+                    return [4 /*yield*/, Solana_rpc_service_1.GetBlock(Slot)];
+                case 2:
                     blockPayload = _a.sent();
                     Block = blockPayload.body.result;
-                    if (!!Block) return [3 /*break*/, 2];
-                    Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
-                    return [3 /*break*/, 5];
-                case 2:
-                    if (!Block.blockhash) return [3 /*break*/, 4];
-                    return [4 /*yield*/, AddBlockToCache(Block, Slot)];
+                    if (!Block) {
+                        Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
+                    }
+                    else {
+                        Blocks.push({ Block: Block, Slot: Slot });
+                    }
+                    _a.label = 3;
                 case 3:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 4:
+                    if (!(Blocks.length > 0)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, AddBlockToCache(Blocks)];
+                case 5:
                     Error_1 = _a.sent();
                     if (Error_1) {
                         Log_util_1.Log(Error_1);
                     }
-                    return [3 /*break*/, 5];
-                case 4:
+                    return [3 /*break*/, 7];
+                case 6:
                     Log_util_1.Log("Solarweave is now in sync with the latest block".yellow);
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
+                    _a.label = 7;
+                case 7: return [2 /*return*/];
             }
         });
     });
 }
-exports.CacheBlock = CacheBlock;
+exports.CacheBlocks = CacheBlocks;
 //# sourceMappingURL=Solana.scanner.service.js.map

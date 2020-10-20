@@ -69,7 +69,7 @@ function Livestream() {
 exports.Livestream = Livestream;
 function StreamBlocks(slot) {
     return __awaiter(this, void 0, void 0, function () {
-        var lastSlot, slotPayload, latestSlot, ConfirmedBlocks, Slots, i, PromisedBlocks, j, error_1;
+        var lastSlot, slotPayload, latestSlot, ConfirmedBlocks, Slots, i, PromisedSlots, j, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -91,11 +91,11 @@ function StreamBlocks(slot) {
                     _a.label = 4;
                 case 4:
                     if (!(i < Slots.length)) return [3 /*break*/, 7];
-                    PromisedBlocks = [];
+                    PromisedSlots = [];
                     for (j = 0; j < Config_1.SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
-                        PromisedBlocks.push(Solana_scanner_service_1.CacheBlock(Slots[i + j]));
+                        PromisedSlots.push(Slots[i + j]);
                     }
-                    return [4 /*yield*/, Promise.all(PromisedBlocks)];
+                    return [4 /*yield*/, Solana_scanner_service_1.CacheBlocks(PromisedSlots)];
                 case 5:
                     _a.sent();
                     lastSlot = Slots[i];

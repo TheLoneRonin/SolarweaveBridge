@@ -22,29 +22,33 @@ export async function GetBalance() {
     return { address, balance };
 }
 
-export async function SubmitBlockToArweave(transaction: ArweaveTransaction) {
+export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
     const key = await LoadWallet();
 
-    const bundle = await BundleItem(transaction, key);
-    const bundles = await BundleIndices(transaction, key);
-    bundles.push(bundle);
+    const bundles = [];
+
+    for (let i = 0; i < transactions.length; i++) {
+        const transaction = transactions[i];
+
+        const bundledItem = await BundleItem(transaction, key);
+        const bundledIndices = await BundleIndices(transaction, key);
+
+        bundles.concat(bundledItem, bundledIndices);
+    }
 
     const data: Transaction[] = await ArData.bundleData(bundles);
 
-    let tx = await arweave.createTransaction({ data }, key);
+    let tx = await arweave.createTransaction({ data: JSON.stringify(data) }, key);
 
     tx.addTag('Bundle-Type', 'ANS-102');
     tx.addTag('Bundle-Format', 'json');
     tx.addTag('Bundle-Version', '1.0.0');
     tx.addTag('Content-Type', 'application/json');
-    tx.addTag('database', SolarweaveConfig.database);
 
     await arweave.transactions.sign(tx, key);
     await arweave.transactions.post(tx);
 
-    Log(`Transmitted Solana Block to Arweave with Parent Slot `.green + `#${transaction.tags.parentSlot}`.green.bold);
-    Log(`Solana Block Hash: `.green + `${transaction.tags.blockhash}\n`.green.bold);
-
+    Log(`Transmitted Solana Blocks with the Slots ${transactions.map(t => t.tags.slot)} to Arweave\n`.green);
     return true;
 }
 
@@ -92,11 +96,12 @@ export async function BundleItem(transaction: ArweaveTransaction, key) {
 
 export async function BundleIndices(transaction: ArweaveTransaction, key) {
     const items = [];
+
     const address = await arweave.wallets.jwkToAddress(key);
     const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(transaction.payload)) : JSON.stringify(transaction.payload);
 
     const tags = [
-        { name: 'database', value: transaction.tags.database },
+        { name: 'database', value: transaction.tags.database + '-index' },
         { name: 'parentSlot', value: transaction.tags.parentSlot },
         { name: 'slot', value: transaction.tags.slot },
         { name: 'blockhash', value: transaction.tags.blockhash },

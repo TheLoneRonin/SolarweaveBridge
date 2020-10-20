@@ -114,7 +114,7 @@ describe('Arweave Service Tests', function () {
                     key = _a.sent();
                     assert_1.equal(key !== null, true);
                     transaction = PrepareTransaction(SampleBlock, slot);
-                    return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave(transaction)];
+                    return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave([transaction])];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];

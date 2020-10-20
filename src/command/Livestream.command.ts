@@ -5,7 +5,7 @@ import { Log } from '../util/Log.util';
 import { Sleep } from '../util/Sleep.util';
 
 import { GetSlot, GetConfirmedBlocks } from '../service/Solana.rpc.service';
-import { CacheBlock } from '../service/Solana.scanner.service';
+import { CacheBlocks } from '../service/Solana.scanner.service';
 
 export async function Livestream() {
     const File = read(`.solarweave.temp`);
@@ -35,13 +35,13 @@ export async function StreamBlocks(slot: number) {
 
         if (latestSlot && Slots) {
             for (let i = 0; i < Slots.length; i += SolarweaveConfig.parallelize) {
-                const PromisedBlocks = [];
+                const PromisedSlots = [];
                 
                 for (let j = 0; j < SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
-                    PromisedBlocks.push(CacheBlock(Slots[i + j]));
+                    PromisedSlots.push(Slots[i + j]);
                 }
 
-                await Promise.all(PromisedBlocks);
+                await CacheBlocks(PromisedSlots);
                 
                 lastSlot = Slots[i];
                 write(`.solarweave.temp`, (lastSlot).toString());

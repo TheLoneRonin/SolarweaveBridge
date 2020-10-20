@@ -72,6 +72,6 @@ describe('Arweave Service Tests', () => {
 
         const transaction: ArweaveTransaction = PrepareTransaction(SampleBlock, slot);
 
-        await SubmitBlockToArweave(transaction);
+        await SubmitBlockToArweave([transaction]);
     });
 });
