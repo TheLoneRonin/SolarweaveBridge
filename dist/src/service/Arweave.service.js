@@ -92,7 +92,7 @@ function SubmitBlockToArweave(transactions) {
                     return [4 /*yield*/, BundleIndices(transaction, key)];
                 case 4:
                     bundledIndices = _a.sent();
-                    bundles.concat(bundledItem, bundledIndices);
+                    bundles = bundles.concat(bundledItem, bundledIndices);
                     _a.label = 5;
                 case 5:
                     i++;
@@ -100,6 +100,7 @@ function SubmitBlockToArweave(transactions) {
                 case 6: return [4 /*yield*/, Config_1.ArData.bundleData(bundles)];
                 case 7:
                     data = _a.sent();
+                    console.log('bundles', data);
                     return [4 /*yield*/, Config_1.arweave.createTransaction({ data: JSON.stringify(data) }, key)];
                 case 8:
                     tx = _a.sent();
