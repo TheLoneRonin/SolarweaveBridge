@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -62,7 +61,8 @@ exports.Solarweave
     .option('--uncompressed', 'store blocks in an uncompressed format', false)
     .option('--parallelize [blocks]', 'the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time', '1')
     .option('--benchmark', 'benchmark Solarweave and start tracking size and speed stats stored in benchmark.json', false)
-    .option('--noverify', 'if caching to Arweave do not double check if the block was already submitted', false);
+    .option('--noverify', 'if caching to Arweave do not double check if the block was already submitted', false)
+    .option('--index', 'if caching to Arweave, index blocks according to signatures and account keys', false);
 exports.Solarweave
     .command('balance')
     .description('retrieve the public address and balance of your Arweave wallet')

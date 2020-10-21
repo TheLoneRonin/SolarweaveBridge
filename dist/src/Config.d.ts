@@ -26,5 +26,5 @@ export declare const ArData: {
     }>;
     unbundleData(txData: any): Promise<import("arweave-bundles").DataItemJson[]>;
 };
-export declare let SolarweaveConfig: SolarweaveInterface;
-export declare function UpdateConfig(rpc_version: string, database: string, arweaveGraphQL: string, url: string, credentials: string, local: boolean, localFile: string, console: boolean, compressed: boolean, parallelize: number, benchmark: boolean, verify: boolean): void;
+export declare const SolarweaveConfig: SolarweaveInterface;
+export declare function UpdateConfig(rpc_version: string, database: string, arweaveGraphQL: string, url: string, credentials: string, local: boolean, localFile: string, console: boolean, compressed: boolean, parallelize: number, benchmark: boolean, verify: boolean, index: boolean): void;

@@ -74,45 +74,52 @@ function GetBalance() {
 exports.GetBalance = GetBalance;
 function SubmitBlockToArweave(transactions) {
     return __awaiter(this, void 0, void 0, function () {
-        var key, bundles, i, transaction, bundledItem, bundledIndices, data, tx;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var key, bundles, i, transaction, bundledItem, bundledIndices, _a, data, tx;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, LoadWallet()];
                 case 1:
-                    key = _a.sent();
+                    key = _b.sent();
                     bundles = [];
                     i = 0;
-                    _a.label = 2;
+                    _b.label = 2;
                 case 2:
-                    if (!(i < transactions.length)) return [3 /*break*/, 6];
+                    if (!(i < transactions.length)) return [3 /*break*/, 8];
                     transaction = transactions[i];
                     return [4 /*yield*/, BundleItem(transaction, key)];
                 case 3:
-                    bundledItem = _a.sent();
+                    bundledItem = _b.sent();
+                    if (!Config_1.SolarweaveConfig.index) return [3 /*break*/, 5];
                     return [4 /*yield*/, BundleIndices(transaction, key)];
                 case 4:
-                    bundledIndices = _a.sent();
-                    bundles = bundles.concat(bundledItem, bundledIndices);
-                    _a.label = 5;
+                    _a = _b.sent();
+                    return [3 /*break*/, 6];
                 case 5:
+                    _a = [];
+                    _b.label = 6;
+                case 6:
+                    bundledIndices = _a;
+                    bundles = bundles.concat(bundledItem, bundledIndices);
+                    _b.label = 7;
+                case 7:
                     i++;
                     return [3 /*break*/, 2];
-                case 6: return [4 /*yield*/, Config_1.ArData.bundleData(bundles)];
-                case 7:
-                    data = _a.sent();
+                case 8: return [4 /*yield*/, Config_1.ArData.bundleData(bundles)];
+                case 9:
+                    data = _b.sent();
                     return [4 /*yield*/, Config_1.arweave.createTransaction({ data: JSON.stringify(data) }, key)];
-                case 8:
-                    tx = _a.sent();
+                case 10:
+                    tx = _b.sent();
                     tx.addTag('Bundle-Type', 'ANS-102');
                     tx.addTag('Bundle-Format', 'json');
                     tx.addTag('Bundle-Version', '1.0.0');
                     tx.addTag('Content-Type', 'application/json');
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
-                case 9:
-                    _a.sent();
+                case 11:
+                    _b.sent();
                     return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
-                case 10:
-                    _a.sent();
+                case 12:
+                    _b.sent();
                     Log_util_1.Log(("Transmitted Solana Blocks with the Slots " + transactions.map(function (t) { return t.tags.slot; }) + " to Arweave\n").green);
                     return [2 /*return*/, true];
             }
@@ -122,7 +129,7 @@ function SubmitBlockToArweave(transactions) {
 exports.SubmitBlockToArweave = SubmitBlockToArweave;
 function BundleItem(transaction, key) {
     return __awaiter(this, void 0, void 0, function () {
-        var address, data, _a, tags, i, solTx, ii, ii, ii, bundle;
+        var address, data, _a, tags, bundle;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, Config_1.arweave.wallets.jwkToAddress(key)];
@@ -145,21 +152,6 @@ function BundleItem(transaction, key) {
                         { name: 'blockhash', value: transaction.tags.blockhash },
                         { name: 'compressed', value: Config_1.SolarweaveConfig.compressed ? 'true' : 'false' },
                     ];
-                    for (i = 0; i < transaction.tags.transactions.length; i++) {
-                        solTx = transaction.tags.transactions[i];
-                        tags.push({ name: "tx-" + i + "-numReadonlySignedAccounts", value: solTx.numReadonlySignedAccounts.toString() });
-                        tags.push({ name: "tx-" + i + "-numReadonlyUnsignedAccounts", value: solTx.numReadonlyUnsignedAccounts.toString() });
-                        tags.push({ name: "tx-" + i + "-numRequiredSignatures", value: solTx.numRequiredSignatures.toString() });
-                        for (ii = 0; ii < solTx.signatures.length; ii++) {
-                            tags.push({ name: "tx-" + i + "-signature-" + ii, value: solTx.signatures[ii] });
-                        }
-                        for (ii = 0; ii < solTx.accountKeys.length; ii++) {
-                            tags.push({ name: "tx-" + i + "-accountKey-" + ii, value: solTx.accountKeys[ii] });
-                        }
-                        for (ii = 0; ii < solTx.programIdIndex.length; ii++) {
-                            tags.push({ name: "tx-" + i + "-programIdIndex-" + ii, value: solTx.programIdIndex[ii].toString() });
-                        }
-                    }
                     return [4 /*yield*/, Config_1.ArData.createData({
                             data: data,
                             tags: tags,
@@ -177,7 +169,7 @@ function BundleItem(transaction, key) {
 exports.BundleItem = BundleItem;
 function BundleIndices(transaction, key) {
     return __awaiter(this, void 0, void 0, function () {
-        var items, address, data, _a, tags, blockhash, signatures, accountKeys, i, solTx, ii, ii, defaultSignature, i, IndexTags, bundle, signedBundle;
+        var items, address, data, _a, blockhash, tags, signatures, accountKeys, i, solTx, ii, ii, i, IndexTags, bundle, signedBundle, i, IndexTags, bundle, signedBundle;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -195,14 +187,14 @@ function BundleIndices(transaction, key) {
                     _b.label = 4;
                 case 4:
                     data = _a;
+                    blockhash = transaction.tags.blockhash;
                     tags = [
                         { name: 'database', value: transaction.tags.database + '-index' },
                         { name: 'parentSlot', value: transaction.tags.parentSlot },
                         { name: 'slot', value: transaction.tags.slot },
-                        { name: 'blockhash', value: transaction.tags.blockhash },
+                        { name: 'blockhash', value: blockhash },
                         { name: 'compressed', value: Config_1.SolarweaveConfig.compressed ? 'true' : 'false' },
                     ];
-                    blockhash = transaction.tags.blockhash;
                     signatures = [];
                     accountKeys = [];
                     for (i = 0; i < transaction.tags.transactions.length; i++) {
@@ -218,17 +210,12 @@ function BundleIndices(transaction, key) {
                             }
                         }
                     }
-                    defaultSignature = '';
-                    if (signatures.length > 0) {
-                        defaultSignature = signatures[0];
-                    }
                     i = 0;
                     _b.label = 5;
                 case 5:
-                    if (!(i < accountKeys.length)) return [3 /*break*/, 9];
-                    IndexTags = tags;
-                    IndexTags.push({ name: 'accountKey', value: accountKeys[i] });
-                    IndexTags.push({ name: 'defaultSignature', value: defaultSignature });
+                    if (!(i < signatures.length)) return [3 /*break*/, 9];
+                    IndexTags = Object.assign([], tags);
+                    IndexTags.push({ name: 'signature', value: signatures[i] });
                     return [4 /*yield*/, Config_1.ArData.createData({
                             data: data,
                             tags: IndexTags,
@@ -245,7 +232,30 @@ function BundleIndices(transaction, key) {
                 case 8:
                     i++;
                     return [3 /*break*/, 5];
-                case 9: return [2 /*return*/, items];
+                case 9:
+                    i = 0;
+                    _b.label = 10;
+                case 10:
+                    if (!(i < accountKeys.length)) return [3 /*break*/, 14];
+                    IndexTags = Object.assign([], tags);
+                    IndexTags.push({ name: 'accountKey', value: accountKeys[i] });
+                    return [4 /*yield*/, Config_1.ArData.createData({
+                            data: data,
+                            tags: IndexTags,
+                            nonce: exports.NONCE,
+                            target: address,
+                        }, key)];
+                case 11:
+                    bundle = _b.sent();
+                    return [4 /*yield*/, Config_1.ArData.sign(bundle, key)];
+                case 12:
+                    signedBundle = _b.sent();
+                    items.push(signedBundle);
+                    _b.label = 13;
+                case 13:
+                    i++;
+                    return [3 /*break*/, 10];
+                case 14: return [2 /*return*/, items];
             }
         });
     });
