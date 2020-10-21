@@ -25,7 +25,7 @@ export async function GetBalance() {
 export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
     const key = await LoadWallet();
 
-    const bundles = [];
+    let bundles = [];
 
     for (let i = 0; i < transactions.length; i++) {
         const transaction = transactions[i];
@@ -33,7 +33,7 @@ export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
         const bundledItem = await BundleItem(transaction, key);
         const bundledIndices = await BundleIndices(transaction, key);
 
-        bundles.concat(bundledItem, bundledIndices);
+        bundles = bundles.concat(bundledItem, bundledIndices);
     }
 
     const data = await ArData.bundleData(bundles);
