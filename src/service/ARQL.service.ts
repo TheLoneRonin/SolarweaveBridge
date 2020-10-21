@@ -136,8 +136,8 @@ export async function RetrieveSignature(solanaSignature: string, database: strin
         transactions(
             first: 1,
             tags: [
-                { name: "database", values: ["${database}"] }
-                { name: "defaultSignature", values: ["${solanaSignature}"] }
+                { name: "database", values: ["${database + '-index'}"] }
+                { name: "signature", values: ["${solanaSignature}"] }
             ]
         ) {
             edges {
@@ -165,13 +165,13 @@ export async function RetrieveSignature(solanaSignature: string, database: strin
     } 
 }
 
-export async function RetrieveAccount(accountKey: string, first: number = 25, after?: string, database: string = `${SolarweaveConfig.database}-index`) {
+export async function RetrieveAccount(accountKey: string, first: number = 25, after?: string, database: string = `${SolarweaveConfig.database}`) {
     const query = `query {
         transactions(
             first: ${first},
             ${after ? `after: "${after}"` : ``},
             tags: [
-                { name: "database", values: ["${database}"] },
+                { name: "database", values: ["${database + '-index'}"] },
                 { name: "accountKey", values: ["${accountKey}"] }
             ],
             sort: HEIGHT_DESC

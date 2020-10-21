@@ -11,4 +11,5 @@ export interface SolarweaveInterface {
     parallelize: number;
     benchmark: boolean;
     verify: boolean;
+    index: boolean;
 }

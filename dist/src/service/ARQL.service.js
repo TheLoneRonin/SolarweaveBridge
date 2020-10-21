@@ -166,7 +166,7 @@ function RetrieveSignature(solanaSignature, database) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    query = "query {\n        transactions(\n            first: 1,\n            tags: [\n                { name: \"database\", values: [\"" + database + "\"] }\n                { name: \"defaultSignature\", values: [\"" + solanaSignature + "\"] }\n            ]\n        ) {\n            edges {\n                cursor\n                node {\n                    id\n                    tags {\n                        name\n                        value\n                    }\n                }\n            }\n        }\n    }";
+                    query = "query {\n        transactions(\n            first: 1,\n            tags: [\n                { name: \"database\", values: [\"" + (database + '-index') + "\"] }\n                { name: \"signature\", values: [\"" + solanaSignature + "\"] }\n            ]\n        ) {\n            edges {\n                cursor\n                node {\n                    id\n                    tags {\n                        name\n                        value\n                    }\n                }\n            }\n        }\n    }";
                     return [4 /*yield*/, GraphQL(query)];
                 case 1:
                     edges = _a.sent();
@@ -184,13 +184,13 @@ function RetrieveSignature(solanaSignature, database) {
 exports.RetrieveSignature = RetrieveSignature;
 function RetrieveAccount(accountKey, first, after, database) {
     if (first === void 0) { first = 25; }
-    if (database === void 0) { database = Config_1.SolarweaveConfig.database + "-index"; }
+    if (database === void 0) { database = "" + Config_1.SolarweaveConfig.database; }
     return __awaiter(this, void 0, void 0, function () {
         var query;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    query = "query {\n        transactions(\n            first: " + first + ",\n            " + (after ? "after: \"" + after + "\"" : "") + ",\n            tags: [\n                { name: \"database\", values: [\"" + database + "\"] },\n                { name: \"accountKey\", values: [\"" + accountKey + "\"] }\n            ],\n            sort: HEIGHT_DESC\n        ) {\n            edges {\n                cursor\n                node {\n                    id\n                    tags {\n                        name\n                        value\n                    }\n                }\n            }\n        }\n    }";
+                    query = "query {\n        transactions(\n            first: " + first + ",\n            " + (after ? "after: \"" + after + "\"" : "") + ",\n            tags: [\n                { name: \"database\", values: [\"" + (database + '-index') + "\"] },\n                { name: \"accountKey\", values: [\"" + accountKey + "\"] }\n            ],\n            sort: HEIGHT_DESC\n        ) {\n            edges {\n                cursor\n                node {\n                    id\n                    tags {\n                        name\n                        value\n                    }\n                }\n            }\n        }\n    }";
                     return [4 /*yield*/, GraphQL(query)];
                 case 1: return [2 /*return*/, _a.sent()];
             }

@@ -12,6 +12,8 @@ If you want to review the benchmarks for Solarweave, check out the [Benchmarks](
 
 Solarweave is also now accessible as a library. Check out the [Library](./LIBRARY.md) document to learn more!
 
+Do you need more flexibility when livestreaming blocks? Check out the example [Workflows](./workflow/README.md) documents to learn more.
+
 ----
 
 ## Getting started
@@ -53,9 +55,10 @@ Options:
   --localFile [file path]    if caching data locally, specify the file path (default: "solarweave.cache.json")
   --console                  do not output log data to console (default: false)
   --uncompressed             store blocks in an uncompressed format (default: false)
-  --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")     
+  --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")
   --benchmark                benchmark Solarweave and start tracking size and speed stats stored in benchmark.json (default: false)
   --noverify                 if caching to Arweave do not double check if the block was already submitted (default: false)
+  --index                    if caching to Arweave, index blocks according to signatures and account keys (default: false)
   -h, --help                 display help for command
 
 Commands:
@@ -209,6 +212,16 @@ If in any case you didn't want to double check that if a block was already submi
 $ solarweave --noverify
 ```
 
+#### Indexing Blocks
+
+If you wanted to index blocks by both signature and account key. You can use pass the `--index` flag.
+
+***Note that this has been disabled by default for performance reasons***
+
+```bash
+$ solarweave --index
+```
+
 ----
 
 ## Finding Blocks with ArQL
@@ -231,99 +244,42 @@ This is the slot of the confirmed block.
 
 This is the blockhash provided by the confirmed block.
 
-### Transaction tags
+### Transaction Indexed Tags
 
-In the case you ever wanted to navigate blocks by a specific transaction, account key or signature. You absolutely can, however, transactions, account keys and signatures may need to be iterated over several indices in order to find a match. The anatomy of transaction tags are as follows.
+In the case you ever wanted to navigate blocks by specific transaction account keys or signatures. You can navigate the indexed version of the database.
 
-##### signatures
+##### Signatures
 
-Signatures are tagged in the following way:
+Signatures are compacted into arrays and are indexed based on the order of transactions. Retrieving the signature is fairly straight forward.
 
-```bash
-tx-{transaction index}-signature-{signature index}
+```typescript
+const signature = IndexBlock.Tags.filter(t => t.name === 'signature')[0];
+```
+**Example Usage**
+
+```typescript
+import { RetrieveSignature } from '@theronin/solarweave';
+const Block = await RetrieveSignature('...Solana Signature');
+
+console.log(Block);
+// { BlockData, Tags }
 ```
 
-Where `{transaction index}` is the index of the transaction in the Block and `{signature index}` is the index of the signature in the transaction.
+##### Account Keys
 
-**Example**
+You can retrieve several blocks associated with an account key by using the `RetrieveAccount` function.
 
-```bash
-tx-0-signature-0
-tx-1-signature-0
-tx-2-signature-2
+```typescript
+const accountKey = IndexBlock.Tags.filter(t => t.name === 'accountKey')[0];
 ```
+**Example Usage**
 
-##### accountKey
+```typescript
+import { RetrieveAccount } from '@theronin/solarweave';
+const Blocks = await RetrieveSignature('...Account Key', 10);
 
-Account Keys are tagged in the following way:
-
-```bash
-tx-{transaction index}-accountKey-{account key index}
-```
-
-Where `{transaction index}` is the index of the transaction in the Block and `{account key index}` is the index of the account key in the transaction.
-
-**Example**
-
-```bash
-tx-0-accountKey-0
-tx-1-accountKey-0
-tx-2-accountKey-2
-```
-
-##### programIdIndex
-
-Program IDs are tagged in the following way:
-
-```bash
-tx-{transaction index}-programIdIndex-{program id}
-```
-
-Where `{transaction index}` is the index of the transaction in the Block and `{program id}` is the index of the program id in the transaction.
-
-**Example**
-
-```bash
-tx-0-programIdIndex-0
-tx-1-programIdIndex-0
-tx-2-programIdIndex-2
-```
-
-#### Additional transaction tags
-
-In the case you may need to refine your `ArQL` query. You can use the following tags to navigate Solarweave.
-
-##### numReadonlySignedAccounts
-
-Which is the `numReadonlySignedAccounts` of the transaction
-
-**Example**
-
-```bash
-tx-0-numReadonlySignedAccounts
-tx-1-numReadonlySignedAccounts
-```
-
-##### numReadonlyUnsignedAccounts
-
-Which is the `numReadonlyUnsignedAccounts` of the transaction
-
-**Example**
-
-```bash
-tx-0-numReadonlyUnsignedAccounts
-tx-1-numReadonlyUnsignedAccounts
-```
-
-##### numRequiredSignatures
-
-Which is the `numRequiredSignatures` of the transaction
-
-**Example**
-
-```bash
-tx-0-numRequiredSignatures
-tx-1-numRequiredSignatures
+console.log(Blocks);
+// [ { BlockData, Tags } ... ]
 ```
 
 ----

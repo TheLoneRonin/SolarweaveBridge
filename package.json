@@ -1,6 +1,6 @@
 {
   "name": "@theronin/solarweave",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "main": "dist/src/Solarweave.library.js",
   "repository": "https://github.com/TheLoneRonin/SolarweaveBridge.git",
   "license": "MIT",
@@ -8,7 +8,7 @@
   "preferGlobal": true,
   "scripts": {
     "start": "npm run build && node dist/src/Solarweave.js",
-    "build": "tsc --outDir dist",
+    "build": "tsc --outDir dist && node prepend.js",
     "benchmarks": "npm run build && node dist/src/Benchmarks.js",
     "compression-benchmarks": "npm run build && node dist/src/CompressionAnalysis.js",
     "test": "npm run build && nyc mocha dist/test --timeout 10000",

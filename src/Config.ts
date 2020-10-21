@@ -3,6 +3,7 @@ import deepHash from 'arweave/node/lib/deepHash';
 import ArweaveData from 'arweave-bundles';
 
 import { SolarweaveInterface } from './interface/Solarweave.interface';
+import { Solarweave } from './Solarweave';
 
 export const arweave = Arweave.init({
     host: 'arweave.net',
@@ -18,7 +19,7 @@ export const ArData = ArweaveData({
     deepHash,
 })
 
-export let SolarweaveConfig: SolarweaveInterface = {
+export const SolarweaveConfig: SolarweaveInterface = {
     rpc_version: `2.0`,
     database: 'solarweave-devnet',
     arweaveGraphQL: 'https://arweave.dev/graphql',
@@ -31,6 +32,7 @@ export let SolarweaveConfig: SolarweaveInterface = {
     parallelize: 1,
     benchmark: false,
     verify: true,
+    index: false,
 }
 
 export function UpdateConfig(
@@ -46,19 +48,19 @@ export function UpdateConfig(
     parallelize: number,
     benchmark: boolean,
     verify: boolean,
+    index: boolean,
 ) {
-    SolarweaveConfig = {
-        database,
-        rpc_version,
-        arweaveGraphQL,
-        url,
-        credentials,
-        local,
-        localFile,
-        console,
-        compressed,
-        parallelize,
-        benchmark,
-        verify
-    };
+    SolarweaveConfig.rpc_version = rpc_version;
+    SolarweaveConfig.database = database;
+    SolarweaveConfig.arweaveGraphQL = arweaveGraphQL;
+    SolarweaveConfig.url = url;
+    SolarweaveConfig.credentials = credentials;
+    SolarweaveConfig.local = local;
+    SolarweaveConfig.localFile = localFile;
+    SolarweaveConfig.console = console;
+    SolarweaveConfig.compressed = compressed;
+    SolarweaveConfig.parallelize = parallelize;
+    SolarweaveConfig.benchmark = benchmark;
+    SolarweaveConfig.verify = verify;
+    SolarweaveConfig.index = index;
 }

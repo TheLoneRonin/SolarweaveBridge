@@ -19,6 +19,7 @@ describe('Config Tests', () => {
         equal(SolarweaveConfig.parallelize, 1);
         equal(SolarweaveConfig.benchmark, false);
         equal(SolarweaveConfig.verify, true);
+        equal(SolarweaveConfig.index, true);
     });
 
     it('Should be able to update the Solarweave Config', () => {
@@ -34,7 +35,8 @@ describe('Config Tests', () => {
             true,
             1,
             false,
-            true
+            true,
+            false
         );
     });
 });
