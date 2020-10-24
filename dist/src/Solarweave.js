@@ -45,6 +45,7 @@ var Balance_command_1 = require("./command/Balance.command");
 var Latest_command_1 = require("./command/Latest.command");
 var Livestream_command_1 = require("./command/Livestream.command");
 var Cache_command_1 = require("./command/Cache.command");
+var Index_command_1 = require("./command/Index.command");
 exports.Benchmark = {
     epoch: Number(new Date()),
     actions: [],
@@ -93,6 +94,13 @@ exports.Solarweave
     .action(function () {
     Command_util_1.ProcessCommand(exports.Solarweave);
     Cache_command_1.Cache();
+});
+exports.Solarweave
+    .command('index')
+    .description('index an existing database with their Account Keys and Signatures')
+    .action(function () {
+    Command_util_1.ProcessCommand(exports.Solarweave);
+    Index_command_1.Index();
 });
 exports.Solarweave.parse(process.argv);
 //# sourceMappingURL=Solarweave.js.map

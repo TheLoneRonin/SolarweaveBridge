@@ -2,7 +2,7 @@ import Arweave = require('arweave');
 import { equal } from 'assert';
 import { SolarweaveConfig } from '../src/Config';
 import { ArweaveTransaction } from '../src/interface/Arweave.interface';
-import { LoadWallet, GetBalance, SubmitBlockToArweave } from '../src/service/Arweave.service';
+import { LoadWallet, GetBalance, SubmitBlocksToArweave } from '../src/service/Arweave.service';
 
 export const arweave = Arweave.init({
     host: 'arweave.net',
@@ -72,6 +72,6 @@ describe('Arweave Service Tests', () => {
 
         const transaction: ArweaveTransaction = PrepareTransaction(SampleBlock, slot);
 
-        await SubmitBlockToArweave([transaction]);
+        await SubmitBlocksToArweave([transaction]);
     });
 });

@@ -22,7 +22,7 @@ export async function GetBalance() {
     return { address, balance };
 }
 
-export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
+export async function SubmitBlocksToArweave(transactions: ArweaveTransaction[], type: string = 'standard') {
     const key = await LoadWallet();
 
     let bundles = [];
@@ -30,16 +30,19 @@ export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
     for (let i = 0; i < transactions.length; i++) {
         const transaction = transactions[i];
 
-        const bundledItem = await BundleItem(transaction, key);
-        const bundledIndices = SolarweaveConfig.index ? await BundleIndices(transaction, key) : [];
-
-        bundles = bundles.concat(bundledItem, bundledIndices);
+        if (type === 'standard') {
+            const bundledItem = await BundleItem(transaction, key);
+            const bundledIndices = SolarweaveConfig.index ? await BundleIndices(transaction, key) : [];
+            bundles = bundles.concat(bundledItem, bundledIndices);
+        } else if (type === 'index') {
+            const bundledIndices = await BundleIndices(transaction, key);
+            bundles = bundles.concat(bundledIndices);
+        }
     }
 
     const data = await ArData.bundleData(bundles);
-
     let tx = await arweave.createTransaction({ data: JSON.stringify(data) }, key);
-
+    
     tx.addTag('Bundle-Type', 'ANS-102');
     tx.addTag('Bundle-Format', 'json');
     tx.addTag('Bundle-Version', '1.0.0');
@@ -48,7 +51,7 @@ export async function SubmitBlockToArweave(transactions: ArweaveTransaction[]) {
     await arweave.transactions.sign(tx, key);
     await arweave.transactions.post(tx);
 
-    Log(`Transmitted Solana Blocks with the Slots ${transactions.map(t => t.tags.slot)} to Arweave\n`.green);
+    Log(`Transmitted Solana ${type === 'index' ? 'Indexed Blocks' : 'Blocks'} with the Slots ${transactions.map(t => t.tags.slot)} to Arweave\n`.green);
     return true;
 }
 
@@ -78,7 +81,6 @@ export async function BundleIndices(transaction: ArweaveTransaction, key) {
     const items = [];
 
     const address = await arweave.wallets.jwkToAddress(key);
-    const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(transaction.payload)) : JSON.stringify(transaction.payload);
     const blockhash = transaction.tags.blockhash;
 
     const tags = [
@@ -89,50 +91,31 @@ export async function BundleIndices(transaction: ArweaveTransaction, key) {
         { name: 'compressed', value: SolarweaveConfig.compressed ? 'true' : 'false' },
     ];
 
-    const signatures = [];
-    const accountKeys = [];
+    for (let i = 0; i < transaction.payload.transactions.length; i++) {
+        const tx = transaction.payload.transactions[i];
+        const txTags = Object.assign([], tags);
+        const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(tx)) : JSON.stringify(tx);
 
-    for (let i = 0; i < transaction.tags.transactions.length; i++) {
-        const solTx = transaction.tags.transactions[i];
+        txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[0] });
+        txTags.push({ name: 'signature', value: tx.transaction.signatures[0] });
 
-        for (let ii = 0; ii < solTx.signatures.length; ii++) {
-            if (signatures.indexOf(solTx.signatures[ii]) === -1) {
-                signatures.push(solTx.signatures[ii]);
-            }
+        txTags.push({ name: 'numReadonlySignedAccounts', value: tx.transaction.message.header.numReadonlySignedAccounts });
+        txTags.push({ name: 'numReadonlyUnsignedAccounts', value: tx.transaction.message.header.numReadonlyUnsignedAccounts });
+        txTags.push({ name: 'numRequiredSignatures', value: tx.transaction.message.header.numRequiredSignatures });
+
+        for (let i = 0; i < tx.transaction.message.accountKeys.length; i++) {
+            const key = tx.transaction.message.accountKeys[i];
+            txTags.push({ name: `accountKey[${i}]`, value: key });
         }
-    
-        for (let ii = 0; ii < solTx.accountKeys.length; ii++) {
-            if (accountKeys.indexOf(solTx.accountKeys[ii]) === -1) {
-                accountKeys.push(solTx.accountKeys[ii]);
-            }
+
+        for (let i = 0; i < tx.transaction.signatures.length; i++) {
+            const sig = tx.transaction.signatures[i];
+            txTags.push({ name: `signature[${i}]`, value: sig });
         }
-    }
-
-    for (let i = 0; i < signatures.length; i++) {
-        const IndexTags = Object.assign([], tags);
-
-        IndexTags.push({ name: 'signature', value: signatures[i] });
 
         const bundle = await ArData.createData({
             data,
-            tags: IndexTags,
-            nonce: NONCE,
-            target: address,
-        }, key);
-
-        const signedBundle = await ArData.sign(bundle, key);
-
-        items.push(signedBundle);
-    }
-
-    for (let i = 0; i < accountKeys.length; i++) {
-        const IndexTags = Object.assign([], tags);
-
-        IndexTags.push({ name: 'accountKey', value: accountKeys[i] });
-
-        const bundle = await ArData.createData({
-            data,
-            tags: IndexTags,
+            tags: txTags,
             nonce: NONCE,
             target: address,
         }, key);

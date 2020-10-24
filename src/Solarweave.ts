@@ -6,6 +6,7 @@ import { Balance } from './command/Balance.command';
 import { LatestBlock } from './command/Latest.command';
 import { Livestream } from './command/Livestream.command';
 import { Cache } from './command/Cache.command';
+import { Index } from './command/Index.command';
 
 export const Benchmark = {
     epoch: Number(new Date()),
@@ -59,6 +60,14 @@ Solarweave
     .action(() => {
         ProcessCommand(Solarweave);
         Cache();
+    });
+
+Solarweave
+    .command('index')
+    .description('index an existing database with their Account Keys and Signatures')
+    .action(() => {
+        ProcessCommand(Solarweave);
+        Index();
     });
 
 Solarweave.parse(process.argv);

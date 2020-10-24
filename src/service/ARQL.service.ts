@@ -1,6 +1,4 @@
 import { post } from 'superagent';
-import { and, equals } from 'arql-ops';
-
 import { SolarweaveConfig, arweave } from '../Config';
 import { DecompressBlock } from '../service/Compression.service';
 
@@ -28,7 +26,7 @@ export async function GraphQL(query: string) {
     return payload.body.data.transactions.edges;
 }
 
-export async function RetrieveBlocks(first: number = 25, after?: string,  database: string = `${SolarweaveConfig.database}-index`) {
+export async function RetrieveBlocks(first: number = 25, after?: string,  database: string = `${SolarweaveConfig.database}`) {
     const query = `query {
         transactions(
             first: ${first},

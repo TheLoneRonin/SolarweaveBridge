@@ -1,4 +1,4 @@
-import { SolarweaveConfig, Livestream } from 'theronin/solarweave';
+import { SolarweaveConfig, Livestream } from '@theronin/solarweave';
 
 export async function Start() {
   try {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Livestream = exports.Cache = exports.SolarweaveConfig = exports.RetrieveSignature = exports.RetrieveSlot = exports.RetrieveBlockhash = exports.RetrieveAccount = exports.RetrieveBlock = exports.RetrieveBlocks = exports.GraphQL = void 0;
+exports.Index = exports.Livestream = exports.Cache = exports.SolarweaveConfig = exports.RetrieveSignature = exports.RetrieveSlot = exports.RetrieveBlockhash = exports.RetrieveAccount = exports.RetrieveBlock = exports.RetrieveBlocks = exports.GraphQL = void 0;
 var ARQL_service_1 = require("./service/ARQL.service");
 Object.defineProperty(exports, "GraphQL", { enumerable: true, get: function () { return ARQL_service_1.GraphQL; } });
 Object.defineProperty(exports, "RetrieveBlocks", { enumerable: true, get: function () { return ARQL_service_1.RetrieveBlocks; } });
@@ -15,4 +15,6 @@ var Cache_command_1 = require("./command/Cache.command");
 Object.defineProperty(exports, "Cache", { enumerable: true, get: function () { return Cache_command_1.Cache; } });
 var Livestream_command_1 = require("./command/Livestream.command");
 Object.defineProperty(exports, "Livestream", { enumerable: true, get: function () { return Livestream_command_1.Livestream; } });
+var Index_command_1 = require("./command/Index.command");
+Object.defineProperty(exports, "Index", { enumerable: true, get: function () { return Index_command_1.Index; } });
 //# sourceMappingURL=Solarweave.library.js.map

@@ -1,10 +1,11 @@
-import { read, write, remove } from 'fs-jetpack';
+import { read, write } from 'fs-jetpack';
+
+import { SolarweaveConfig } from '../Config';
 import { Log } from '../util/Log.util';
 import { Sleep } from '../util/Sleep.util';
-import { GetFirstSlot, GetSlot, GetConfirmedBlocks, GetBlock } from '../service/Solana.rpc.service';
+
+import { GetFirstSlot, GetSlot, GetConfirmedBlocks } from '../service/Solana.rpc.service';
 import { CacheBlocks } from '../service/Solana.scanner.service';
-import { SolarweaveConfig } from '../Config';
-import { Solarweave } from '../Solarweave';
 
 export async function Cache() {
     const File = read(`.solarweave.temp`);

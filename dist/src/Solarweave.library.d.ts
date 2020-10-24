@@ -2,4 +2,5 @@ import { GraphQL, RetrieveBlocks, RetrieveBlock, RetrieveAccount, RetrieveBlockh
 import { SolarweaveConfig } from './Config';
 import { Cache } from './command/Cache.command';
 import { Livestream } from './command/Livestream.command';
-export { GraphQL, RetrieveBlocks, RetrieveBlock, RetrieveAccount, RetrieveBlockhash, RetrieveSlot, RetrieveSignature, SolarweaveConfig, Cache, Livestream, };
+import { Index } from './command/Index.command';
+export { GraphQL, RetrieveBlocks, RetrieveBlock, RetrieveAccount, RetrieveBlockhash, RetrieveSlot, RetrieveSignature, SolarweaveConfig, Cache, Livestream, Index, };

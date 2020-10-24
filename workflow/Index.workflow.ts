@@ -1,11 +1,11 @@
-import { SolarweaveConfig, Cache } from '@theronin/solarweave';
+import { SolarweaveConfig, Index } from '@theronin/solarweave';
 
 export async function Start() {
   try {
     SolarweaveConfig.database = 'workflow-database';
     SolarweaveConfig.url = 'https://testnet.node';
     SolarweaveConfig.credentials = '/path/to/creds.json';
-    await Cache();
+    await Index();
   } catch (error) {
     // Log your error here
     console.error(error);

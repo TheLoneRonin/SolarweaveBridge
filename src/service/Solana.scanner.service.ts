@@ -4,8 +4,8 @@ import { SolarweaveConfig } from '../Config';
 import { Log } from '../util/Log.util';
 import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
-import { SubmitBlockToArweave } from './Arweave.service';
-import { RetrieveBlockhash } from './ARQL.service';
+import { SubmitBlocksToArweave } from './Arweave.service';
+import { RetrieveBlockhash, RetrieveSlot } from './ARQL.service';
 import { GetSlot, GetBlock } from './Solana.rpc.service';
 
 export async function GetLatestBlock() {
@@ -18,7 +18,7 @@ export async function GetLatestBlock() {
     return block;
 }
 
-export async function AddBlockToCache(Blocks): Promise<string> {
+export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promise<string> {
     try {
         if (SolarweaveConfig.local) {
             const File = read(SolarweaveConfig.localFile);
@@ -47,19 +47,17 @@ export async function AddBlockToCache(Blocks): Promise<string> {
                 const Slot = Blocks[i].Slot;
 
                 if (SolarweaveConfig.verify) {
-                    if (await RetrieveBlockhash(Block.blockhash)) {
-                        return (`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached`.yellow);
+                    if (await RetrieveBlockhash(Block.blockhash, type === 'standard' ? SolarweaveConfig.database : SolarweaveConfig.database + '-index')) {
+                        return (`Block #${Block.parentSlot + 1} ${Block.blockhash} has already been cached ${type === 'index' ? 'to the index database' : ''}`.yellow);
                     }
                 }
     
                 const transaction: ArweaveTransaction = {
                     tags: {
-                        database: SolarweaveConfig.database,
-                        
+                        database: SolarweaveConfig.database + (type === 'index' ? '-index' : ''),
                         parentSlot: Block.parentSlot.toString(),
                         slot: Slot.toString(),
                         blockhash: Block.blockhash,
-    
                         transactions: [],
                     },
     
@@ -73,7 +71,6 @@ export async function AddBlockToCache(Blocks): Promise<string> {
                         signatures: tx.transaction.signatures,
                         accountKeys: tx.transaction.message.accountKeys,
                         programIdIndex: tx.transaction.message.instructions.map(instruction => instruction.programIdIndex),
-    
                         numReadonlySignedAccounts: tx.transaction.message.header.numReadonlySignedAccounts,
                         numReadonlyUnsignedAccounts: tx.transaction.message.header.numReadonlyUnsignedAccounts,
                         numRequiredSignatures: tx.transaction.message.header.numRequiredSignatures,
@@ -83,7 +80,7 @@ export async function AddBlockToCache(Blocks): Promise<string> {
                 transactions.push(transaction);
             }
 
-            await SubmitBlockToArweave(transactions);
+            await SubmitBlocksToArweave(transactions, type);
         }
 
         LogBenchmark('cache_block');
@@ -94,22 +91,31 @@ export async function AddBlockToCache(Blocks): Promise<string> {
     }
 }
 
-export async function CacheBlocks(Slots: Array<number>) {
+export async function CacheBlocks(Slots: Array<number>, type: string = 'standard') {
     const Blocks = [];
     for (let i = 0; i < Slots.length; i++) {
         const Slot = Slots[i];
-        const blockPayload = await GetBlock(Slot);
-        const Block = blockPayload.body.result;
-
-        if (!Block) {
-            Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+        if (type === 'standard') {
+            const blockPayload = await GetBlock(Slot);
+            const Block = blockPayload.body.result;
+            if (!Block) {
+                Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+            } else {
+                Blocks.push({ Block, Slot });
+            }   
         } else {
-            Blocks.push({ Block, Slot });
-        }        
+            const blockPayload = await RetrieveSlot(Slot.toString());
+            const Block = blockPayload.BlockData;
+            if (!Block) {
+                Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+            } else {
+                Blocks.push({ Block, Slot });
+            } 
+        }     
     }    
 
     if (Blocks.length > 0) {
-        const Error: string = await AddBlockToCache(Blocks);
+        const Error: string = await AddBlocksToCache(Blocks, type);
         if (Error) { Log(Error) }
     } else {
         Log(`Solarweave is now in sync with the latest block`.yellow);

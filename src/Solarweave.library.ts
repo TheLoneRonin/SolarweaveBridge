@@ -3,6 +3,7 @@ import { GraphQL, RetrieveBlocks, RetrieveBlock, RetrieveAccount, RetrieveBlockh
 import { SolarweaveConfig } from './Config';
 import { Cache } from './command/Cache.command';
 import { Livestream } from './command/Livestream.command';
+import { Index } from './command/Index.command';
 
 export {
     GraphQL,
@@ -16,4 +17,5 @@ export {
     SolarweaveConfig,
     Cache,
     Livestream,
+    Index,
 }

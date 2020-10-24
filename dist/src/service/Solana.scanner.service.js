@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CacheBlocks = exports.AddBlockToCache = exports.GetLatestBlock = void 0;
+exports.CacheBlocks = exports.AddBlocksToCache = exports.GetLatestBlock = void 0;
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
@@ -63,7 +63,8 @@ function GetLatestBlock() {
     });
 }
 exports.GetLatestBlock = GetLatestBlock;
-function AddBlockToCache(Blocks) {
+function AddBlocksToCache(Blocks, type) {
+    if (type === void 0) { type = 'standard'; }
     return __awaiter(this, void 0, void 0, function () {
         var File_1, Data, _loop_1, i, state_1, transactions, i, Block, Slot, transaction, i_1, tx, error_1;
         return __generator(this, function (_a) {
@@ -100,16 +101,16 @@ function AddBlockToCache(Blocks) {
                     Block = Blocks[i].Block;
                     Slot = Blocks[i].Slot;
                     if (!Config_1.SolarweaveConfig.verify) return [3 /*break*/, 4];
-                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockhash(Block.blockhash)];
+                    return [4 /*yield*/, ARQL_service_1.RetrieveBlockhash(Block.blockhash, type === 'standard' ? Config_1.SolarweaveConfig.database : Config_1.SolarweaveConfig.database + '-index')];
                 case 3:
                     if (_a.sent()) {
-                        return [2 /*return*/, (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached").yellow)];
+                        return [2 /*return*/, (("Block #" + (Block.parentSlot + 1) + " " + Block.blockhash + " has already been cached " + (type === 'index' ? 'to the index database' : '')).yellow)];
                     }
                     _a.label = 4;
                 case 4:
                     transaction = {
                         tags: {
-                            database: Config_1.SolarweaveConfig.database,
+                            database: Config_1.SolarweaveConfig.database + (type === 'index' ? '-index' : ''),
                             parentSlot: Block.parentSlot.toString(),
                             slot: Slot.toString(),
                             blockhash: Block.blockhash,
@@ -133,7 +134,7 @@ function AddBlockToCache(Blocks) {
                 case 5:
                     i++;
                     return [3 /*break*/, 2];
-                case 6: return [4 /*yield*/, Arweave_service_1.SubmitBlockToArweave(transactions)];
+                case 6: return [4 /*yield*/, Arweave_service_1.SubmitBlocksToArweave(transactions, type)];
                 case 7:
                     _a.sent();
                     _a.label = 8;
@@ -148,10 +149,11 @@ function AddBlockToCache(Blocks) {
         });
     });
 }
-exports.AddBlockToCache = AddBlockToCache;
-function CacheBlocks(Slots) {
+exports.AddBlocksToCache = AddBlocksToCache;
+function CacheBlocks(Slots, type) {
+    if (type === void 0) { type = 'standard'; }
     return __awaiter(this, void 0, void 0, function () {
-        var Blocks, i, Slot, blockPayload, Block, Error_1;
+        var Blocks, i, Slot, blockPayload, Block, blockPayload, Block, Error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -159,8 +161,9 @@ function CacheBlocks(Slots) {
                     i = 0;
                     _a.label = 1;
                 case 1:
-                    if (!(i < Slots.length)) return [3 /*break*/, 4];
+                    if (!(i < Slots.length)) return [3 /*break*/, 6];
                     Slot = Slots[i];
+                    if (!(type === 'standard')) return [3 /*break*/, 3];
                     return [4 /*yield*/, Solana_rpc_service_1.GetBlock(Slot)];
                 case 2:
                     blockPayload = _a.sent();
@@ -171,23 +174,34 @@ function CacheBlocks(Slots) {
                     else {
                         Blocks.push({ Block: Block, Slot: Slot });
                     }
-                    _a.label = 3;
-                case 3:
+                    return [3 /*break*/, 5];
+                case 3: return [4 /*yield*/, ARQL_service_1.RetrieveSlot(Slot.toString())];
+                case 4:
+                    blockPayload = _a.sent();
+                    Block = blockPayload.BlockData;
+                    if (!Block) {
+                        Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
+                    }
+                    else {
+                        Blocks.push({ Block: Block, Slot: Slot });
+                    }
+                    _a.label = 5;
+                case 5:
                     i++;
                     return [3 /*break*/, 1];
-                case 4:
-                    if (!(Blocks.length > 0)) return [3 /*break*/, 6];
-                    return [4 /*yield*/, AddBlockToCache(Blocks)];
-                case 5:
+                case 6:
+                    if (!(Blocks.length > 0)) return [3 /*break*/, 8];
+                    return [4 /*yield*/, AddBlocksToCache(Blocks, type)];
+                case 7:
                     Error_1 = _a.sent();
                     if (Error_1) {
                         Log_util_1.Log(Error_1);
                     }
-                    return [3 /*break*/, 7];
-                case 6:
+                    return [3 /*break*/, 9];
+                case 8:
                     Log_util_1.Log("Solarweave is now in sync with the latest block".yellow);
-                    _a.label = 7;
-                case 7: return [2 /*return*/];
+                    _a.label = 9;
+                case 9: return [2 /*return*/];
             }
         });
     });

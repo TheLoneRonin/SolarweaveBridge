@@ -36,88 +36,81 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TraverseBlocks = exports.Cache = void 0;
+exports.TraverseBlocks = exports.Index = void 0;
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
 var Sleep_util_1 = require("../util/Sleep.util");
-var Solana_rpc_service_1 = require("../service/Solana.rpc.service");
+var ARQL_service_1 = require("../service/ARQL.service");
 var Solana_scanner_service_1 = require("../service/Solana.scanner.service");
-function Cache() {
+function Index() {
     return __awaiter(this, void 0, void 0, function () {
-        var File, slot, slotPayload, slot;
+        var File;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    File = fs_jetpack_1.read(".solarweave.temp");
-                    if (!File) return [3 /*break*/, 1];
-                    Log_util_1.Log('An existing temp cache was found, restarting the cache process\n'.yellow.bold);
-                    slot = Number(File);
-                    TraverseBlocks(slot);
-                    return [3 /*break*/, 3];
-                case 1: return [4 /*yield*/, Solana_rpc_service_1.GetFirstSlot()];
-                case 2:
-                    slotPayload = _a.sent();
-                    slot = slotPayload.body.result;
-                    TraverseBlocks(slot);
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+            File = fs_jetpack_1.read(".solarweave.temp");
+            if (File) {
+                Log_util_1.Log('An existing temp cache was found, restarting the cache process\n'.yellow.bold);
+                TraverseBlocks();
             }
+            else {
+                TraverseBlocks();
+            }
+            return [2 /*return*/];
         });
     });
 }
-exports.Cache = Cache;
-function TraverseBlocks(slot) {
+exports.Index = Index;
+function TraverseBlocks(cursor) {
+    if (cursor === void 0) { cursor = ''; }
     return __awaiter(this, void 0, void 0, function () {
-        var lastSlot, slotPayload, latestSlot, ConfirmedBlocks, Slots, i, PromisedSlots, j, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var Cursor, BlockIndices, Blocks, i, BlockIndex, ArweaveId, BlockTags, Block, _a, _b, Slot, Error_1, error_1;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
-                    lastSlot = slot;
-                    _a.label = 1;
+                    Cursor = cursor;
+                    _c.label = 1;
                 case 1:
-                    _a.trys.push([1, 10, , 12]);
-                    return [4 /*yield*/, Solana_rpc_service_1.GetSlot()];
+                    _c.trys.push([1, 10, , 12]);
+                    return [4 /*yield*/, ARQL_service_1.RetrieveBlocks(Config_1.SolarweaveConfig.parallelize, cursor)];
                 case 2:
-                    slotPayload = _a.sent();
-                    latestSlot = slotPayload.body.result;
-                    Log_util_1.Log("Cache is at Block ".yellow + ("" + slot).yellow.bold + ", latest block is ".yellow + ("" + (latestSlot ? latestSlot : 'Unknown (getSlot RPC Error)')).yellow.bold);
-                    return [4 /*yield*/, Solana_rpc_service_1.GetConfirmedBlocks(slot, slot + 1000)];
-                case 3:
-                    ConfirmedBlocks = _a.sent();
-                    Slots = ConfirmedBlocks.body.result;
-                    if (!Slots) return [3 /*break*/, 8];
+                    BlockIndices = _c.sent();
+                    Blocks = [];
                     i = 0;
-                    _a.label = 4;
+                    _c.label = 3;
+                case 3:
+                    if (!(i < BlockIndices.length)) return [3 /*break*/, 6];
+                    BlockIndex = BlockIndices[i];
+                    ArweaveId = BlockIndex.node.id;
+                    Cursor = BlockIndex.cursor;
+                    BlockTags = BlockIndex.node.tags.map(function (tag) {
+                        return { name: tag.name, value: tag.value };
+                    });
+                    _b = (_a = JSON).parse;
+                    return [4 /*yield*/, ARQL_service_1.RetrieveBlock(ArweaveId)];
                 case 4:
-                    if (!(i < Slots.length)) return [3 /*break*/, 7];
-                    PromisedSlots = [];
-                    for (j = 0; j < Config_1.SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
-                        PromisedSlots.push(Slots[i + j]);
-                    }
-                    return [4 /*yield*/, Solana_scanner_service_1.CacheBlocks(PromisedSlots)];
+                    Block = _b.apply(_a, [_c.sent()]);
+                    Slot = Number(BlockTags.filter(function (t) { return t.name === 'slot'; })[0].value);
+                    Blocks.push({ Block: Block, Slot: Slot });
+                    _c.label = 5;
                 case 5:
-                    _a.sent();
-                    lastSlot = Slots[i];
-                    fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
-                    _a.label = 6;
+                    i++;
+                    return [3 /*break*/, 3];
                 case 6:
-                    i += Config_1.SolarweaveConfig.parallelize;
-                    return [3 /*break*/, 4];
+                    if (!(Blocks.length > 0)) return [3 /*break*/, 8];
+                    return [4 /*yield*/, Solana_scanner_service_1.AddBlocksToCache(Blocks, 'index')];
                 case 7:
-                    TraverseBlocks(lastSlot);
+                    Error_1 = _c.sent();
+                    if (Error_1) {
+                        Log_util_1.Log(Error_1);
+                    }
+                    TraverseBlocks(Cursor);
                     return [3 /*break*/, 9];
                 case 8:
-                    if (slotPayload.body.error) {
-                        Log_util_1.Log(("RPC ERROR CODE " + slotPayload.body.error.code + ": " + slotPayload.body.error.message).red.bold);
-                    }
-                    else {
-                        Log_util_1.Log("Could not retrieve slots".red.bold);
-                    }
-                    _a.label = 9;
+                    Log_util_1.Log("Solarweave Index Database is now in sync with the latest block".yellow);
+                    _c.label = 9;
                 case 9: return [3 /*break*/, 12];
                 case 10:
-                    error_1 = _a.sent();
+                    error_1 = _c.sent();
                     if (error_1.response) {
                         console.error(("RPC ERROR: " + error_1.response.text + "\n").red.bold);
                     }
@@ -127,8 +120,8 @@ function TraverseBlocks(slot) {
                     Log_util_1.Log("Attempting to restart caching process\n".yellow.bold);
                     return [4 /*yield*/, Sleep_util_1.Sleep(2500)];
                 case 11:
-                    _a.sent();
-                    TraverseBlocks(lastSlot);
+                    _c.sent();
+                    TraverseBlocks(Cursor);
                     return [3 /*break*/, 12];
                 case 12: return [2 /*return*/];
             }
@@ -136,4 +129,4 @@ function TraverseBlocks(slot) {
     });
 }
 exports.TraverseBlocks = TraverseBlocks;
-//# sourceMappingURL=Cache.command.js.map
+//# sourceMappingURL=Index.command.js.map

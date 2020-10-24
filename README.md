@@ -66,6 +66,7 @@ Commands:
   latest                     retrieve the latest block and output the block to console
   livestream                 livestream blocks directly to your arweave database (or locally)
   cache                      retrieve all the blocks that are still available and store them in Arweave
+  index                      index an existing database with their Account Keys and Signatures
   help [command]             display help for command
 ```
 
@@ -128,7 +129,18 @@ Transmitted Solana Block to Arweave with Parent Slot #1025206
 Solana Block Hash: 7HSFZ67NQNPDDhGGUzEgd3afVxpEoKoox9ZHuJE9u5BR
 ```
 
-**Note that both the livestream and cache command will periodically notify you which block they're at.**
+#### Indexing Blocks
+
+If you want to index an existing Arweave Database. You can run the `index` command.
+
+```bash
+$ solarweave cache
+
+Cache is at Block 1025207, latest block is 1925007
+
+Transmitted Solana Block to Arweave with Parent Slot #1025206
+Solana Block Hash: 7HSFZ67NQNPDDhGGUzEgd3afVxpEoKoox9ZHuJE9u5BR
+```
 
 ----
 
@@ -280,6 +292,31 @@ const Blocks = await RetrieveAccount('...Account Key', 10);
 
 console.log(Blocks);
 // [ { BlockData, Tags } ... ]
+```
+
+#### Additional Tags
+
+Additional tags are provided for the metadata of the transaction.
+
+```bash
+numReadonlySignedAccounts
+numReadonlyUnsignedAccounts
+numRequiredSignatures
+
+accountKey[]
+signature[]
+```
+
+If you want to get a specific accountKey via Arweave Tags.
+
+```bash
+accountKey[0]
+accountKey[1]
+```
+
+```bash
+signature[0]
+signature[1]
 ```
 
 ----

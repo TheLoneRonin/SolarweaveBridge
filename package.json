@@ -1,6 +1,6 @@
 {
   "name": "@theronin/solarweave",
-  "version": "1.7.0",
+  "version": "1.8.1",
   "main": "dist/src/Solarweave.library.js",
   "repository": "https://github.com/TheLoneRonin/SolarweaveBridge.git",
   "license": "MIT",
@@ -19,7 +19,6 @@
     "solarweave": "dist/src/Solarweave.js"
   },
   "dependencies": {
-    "arql-ops": "^1.0.0",
     "arweave": "^1.9.1",
     "arweave-bundles": "^1.0.0",
     "colors": "^1.4.0",

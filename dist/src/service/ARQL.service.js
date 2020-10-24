@@ -82,7 +82,7 @@ function GraphQL(query) {
 exports.GraphQL = GraphQL;
 function RetrieveBlocks(first, after, database) {
     if (first === void 0) { first = 25; }
-    if (database === void 0) { database = Config_1.SolarweaveConfig.database + "-index"; }
+    if (database === void 0) { database = "" + Config_1.SolarweaveConfig.database; }
     return __awaiter(this, void 0, void 0, function () {
         var query;
         return __generator(this, function (_a) {
