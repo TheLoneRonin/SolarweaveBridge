@@ -299,6 +299,7 @@ console.log(Blocks);
 Additional tags are provided for the metadata of the transaction.
 
 ```bash
+programIdIndex
 numReadonlySignedAccounts
 numReadonlyUnsignedAccounts
 numRequiredSignatures

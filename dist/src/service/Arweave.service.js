@@ -194,7 +194,6 @@ function BundleIndices(transaction, key) {
                         { name: 'blockhash', value: blockhash },
                         { name: 'compressed', value: Config_1.SolarweaveConfig.compressed ? 'true' : 'false' },
                     ];
-                    console.log('tags', transaction.tags);
                     i = 0;
                     _b.label = 2;
                 case 2:
@@ -211,8 +210,9 @@ function BundleIndices(transaction, key) {
                     _b.label = 5;
                 case 5:
                     data = _a;
-                    txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[0] });
+                    txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[tx.transaction.instructions.programIdIndex] });
                     txTags.push({ name: 'signature', value: tx.transaction.signatures[0] });
+                    txTags.push({ name: 'programIdIndex', value: tx.transaction.instructions.programIdIndex });
                     txTags.push({ name: 'numReadonlySignedAccounts', value: tx.transaction.message.header.numReadonlySignedAccounts });
                     txTags.push({ name: 'numReadonlyUnsignedAccounts', value: tx.transaction.message.header.numReadonlyUnsignedAccounts });
                     txTags.push({ name: 'numRequiredSignatures', value: tx.transaction.message.header.numRequiredSignatures });
