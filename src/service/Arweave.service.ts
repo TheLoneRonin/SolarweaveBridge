@@ -96,9 +96,10 @@ export async function BundleIndices(transaction: ArweaveTransaction, key) {
         const txTags = Object.assign([], tags);
         const data = SolarweaveConfig.compressed ? await CompressBlock(JSON.stringify(tx)) : JSON.stringify(tx);
 
-        txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[0] });
+        txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[tx.transaction.instructions.programIdIndex] });
         txTags.push({ name: 'signature', value: tx.transaction.signatures[0] });
 
+        txTags.push({ name: 'programIdIndex', value: tx.transaction.instructions.programIdIndex });
         txTags.push({ name: 'numReadonlySignedAccounts', value: tx.transaction.message.header.numReadonlySignedAccounts });
         txTags.push({ name: 'numReadonlyUnsignedAccounts', value: tx.transaction.message.header.numReadonlyUnsignedAccounts });
         txTags.push({ name: 'numRequiredSignatures', value: tx.transaction.message.header.numRequiredSignatures });
