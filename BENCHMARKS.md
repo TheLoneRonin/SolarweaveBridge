@@ -12,12 +12,16 @@ latest block | 833ms
 Parallelization | Average Upload Time | Lowest Upload Time | Highest Upload Time
 --- | --- | --- | ---
 1 | 2769ms | 1961ms | 12013ms
+4 | 768ms | 766ms | 863ms
+8 | 606ms | 587ms | 660ms
 
 #### Livestream Benchmarks
 
 Parallelization | Average Upload Time | Lowest Upload Time | Highest Upload Time
 --- | --- | --- | ---
 1 | 2495ms | 1955ms | 10809ms
+4 | 778ms | 756ms | 862ms
+8 | 595ms | 585ms | 652ms
 
 
 #### Compression Benchmarks

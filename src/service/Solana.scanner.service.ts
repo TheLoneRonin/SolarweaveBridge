@@ -2,6 +2,7 @@
 import { read, write } from 'fs-jetpack';
 import { SolarweaveConfig } from '../Config';
 import { Log } from '../util/Log.util';
+import { Sleep } from '../util/Sleep.util';
 import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { SubmitBlocksToArweave } from './Arweave.service';
@@ -93,27 +94,35 @@ export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promi
 
 export async function CacheBlocks(Slots: Array<number>, type: string = 'standard') {
     const Blocks = [];
+    const Promises = [];
+
     for (let i = 0; i < Slots.length; i++) {
         const Slot = Slots[i];
-        if (type === 'standard') {
-            const blockPayload = await GetBlock(Slot);
-            const Block = blockPayload.body.result;
-            if (!Block) {
-                Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
-            } else {
-                Blocks.push({ Block, Slot });
-            }   
-        } else {
-            const blockPayload = await RetrieveSlot(Slot.toString());
-            const Block = blockPayload.BlockData;
-            if (!Block) {
-                Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
-            } else {
-                Blocks.push({ Block, Slot });
-            } 
-        }     
-    }    
 
+        Promises.push(new Promise(async resolve => {
+            if (type === 'standard') {
+                const blockPayload = await GetBlock(Slot);
+                const Block = blockPayload.body.result;
+                if (!Block) {
+                    Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+                } else {
+                    Blocks.push({ Block, Slot });
+                }   
+            } else {
+                const blockPayload = await RetrieveSlot(Slot.toString());
+                const Block = blockPayload.BlockData;
+                if (!Block) {
+                    Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
+                } else {
+                    Blocks.push({ Block, Slot });
+                } 
+            }   
+            return resolve();
+        }))  
+    }
+
+    await Promise.all(Promises);
+    
     if (Blocks.length > 0) {
         const Error: string = await AddBlocksToCache(Blocks, type);
         if (Error) { Log(Error) }
