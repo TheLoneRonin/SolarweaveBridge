@@ -63,54 +63,63 @@ exports.Index = Index;
 function TraverseBlocks(cursor) {
     if (cursor === void 0) { cursor = ''; }
     return __awaiter(this, void 0, void 0, function () {
-        var Cursor, BlockIndices, Blocks, i, BlockIndex, ArweaveId, BlockTags, Block, _a, _b, Slot, Error_1, error_1;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var Cursor, BlockIndices, BlockPromises, _loop_1, i, Blocks, Error_1, error_1;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     Cursor = cursor;
-                    _c.label = 1;
+                    _a.label = 1;
                 case 1:
-                    _c.trys.push([1, 10, , 12]);
+                    _a.trys.push([1, 7, , 9]);
                     return [4 /*yield*/, ARQL_service_1.RetrieveBlocks(Config_1.SolarweaveConfig.parallelize, cursor)];
                 case 2:
-                    BlockIndices = _c.sent();
-                    Blocks = [];
-                    i = 0;
-                    _c.label = 3;
+                    BlockIndices = _a.sent();
+                    BlockPromises = [];
+                    _loop_1 = function (i) {
+                        var BlockIndex = BlockIndices[i];
+                        var ArweaveId = BlockIndex.node.id;
+                        Cursor = BlockIndex.cursor;
+                        var BlockTags = BlockIndex.node.tags.map(function (tag) {
+                            return { name: tag.name, value: tag.value };
+                        });
+                        var BlockPromise = new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                            var Block, _a, _b, Slot;
+                            return __generator(this, function (_c) {
+                                switch (_c.label) {
+                                    case 0:
+                                        _b = (_a = JSON).parse;
+                                        return [4 /*yield*/, ARQL_service_1.RetrieveBlock(ArweaveId)];
+                                    case 1:
+                                        Block = _b.apply(_a, [_c.sent()]);
+                                        Slot = Number(BlockTags.filter(function (t) { return t.name === 'slot'; })[0].value);
+                                        return [2 /*return*/, resolve({ Block: Block, Slot: Slot })];
+                                }
+                            });
+                        }); });
+                        BlockPromises.push(BlockPromise);
+                    };
+                    for (i = 0; i < BlockIndices.length; i++) {
+                        _loop_1(i);
+                    }
+                    return [4 /*yield*/, Promise.all(BlockPromises)];
                 case 3:
-                    if (!(i < BlockIndices.length)) return [3 /*break*/, 6];
-                    BlockIndex = BlockIndices[i];
-                    ArweaveId = BlockIndex.node.id;
-                    Cursor = BlockIndex.cursor;
-                    BlockTags = BlockIndex.node.tags.map(function (tag) {
-                        return { name: tag.name, value: tag.value };
-                    });
-                    _b = (_a = JSON).parse;
-                    return [4 /*yield*/, ARQL_service_1.RetrieveBlock(ArweaveId)];
-                case 4:
-                    Block = _b.apply(_a, [_c.sent()]);
-                    Slot = Number(BlockTags.filter(function (t) { return t.name === 'slot'; })[0].value);
-                    Blocks.push({ Block: Block, Slot: Slot });
-                    _c.label = 5;
-                case 5:
-                    i++;
-                    return [3 /*break*/, 3];
-                case 6:
-                    if (!(Blocks.length > 0)) return [3 /*break*/, 8];
+                    Blocks = (_a.sent()).filter(function (b) { return b !== null; });
+                    if (!(Blocks.length > 0)) return [3 /*break*/, 5];
                     return [4 /*yield*/, Solana_scanner_service_1.AddBlocksToCache(Blocks, 'index')];
-                case 7:
-                    Error_1 = _c.sent();
+                case 4:
+                    Error_1 = _a.sent();
                     if (Error_1) {
                         Log_util_1.Log(Error_1);
                     }
                     TraverseBlocks(Cursor);
-                    return [3 /*break*/, 9];
-                case 8:
+                    return [3 /*break*/, 6];
+                case 5:
                     Log_util_1.Log("Solarweave Index Database is now in sync with the latest block".yellow);
-                    _c.label = 9;
-                case 9: return [3 /*break*/, 12];
-                case 10:
-                    error_1 = _c.sent();
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 9];
+                case 7:
+                    error_1 = _a.sent();
                     if (error_1.response) {
                         console.error(("RPC ERROR: " + error_1.response.text + "\n").red.bold);
                     }
@@ -119,11 +128,11 @@ function TraverseBlocks(cursor) {
                     }
                     Log_util_1.Log("Attempting to restart caching process\n".yellow.bold);
                     return [4 /*yield*/, Sleep_util_1.Sleep(2500)];
-                case 11:
-                    _c.sent();
+                case 8:
+                    _a.sent();
                     TraverseBlocks(Cursor);
-                    return [3 /*break*/, 12];
-                case 12: return [2 /*return*/];
+                    return [3 /*break*/, 9];
+                case 9: return [2 /*return*/];
             }
         });
     });

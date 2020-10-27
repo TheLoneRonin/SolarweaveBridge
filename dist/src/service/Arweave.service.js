@@ -178,7 +178,7 @@ function BundleItem(transaction, key) {
 exports.BundleItem = BundleItem;
 function BundleIndices(transaction, key) {
     return __awaiter(this, void 0, void 0, function () {
-        var items, address, blockhash, tags, i, tx, txTags, data, _a, i_1, key_1, i_2, sig, bundle, signedBundle;
+        var items, address, blockhash, tags, i, tx, txTags, data, _a, programIdIndex, i_1, key_1, i_2, sig, bundle, signedBundle;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -210,9 +210,10 @@ function BundleIndices(transaction, key) {
                     _b.label = 5;
                 case 5:
                     data = _a;
-                    txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[tx.transaction.instructions.programIdIndex] });
+                    programIdIndex = tx.transaction.message.instructions[0].programIdIndex;
+                    txTags.push({ name: 'accountKey', value: tx.transaction.message.accountKeys[programIdIndex - 1] });
                     txTags.push({ name: 'signature', value: tx.transaction.signatures[0] });
-                    txTags.push({ name: 'programIdIndex', value: tx.transaction.instructions.programIdIndex });
+                    txTags.push({ name: 'programIdIndex', value: programIdIndex });
                     txTags.push({ name: 'numReadonlySignedAccounts', value: tx.transaction.message.header.numReadonlySignedAccounts });
                     txTags.push({ name: 'numReadonlyUnsignedAccounts', value: tx.transaction.message.header.numReadonlyUnsignedAccounts });
                     txTags.push({ name: 'numRequiredSignatures', value: tx.transaction.message.header.numRequiredSignatures });

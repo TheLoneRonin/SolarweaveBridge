@@ -24,7 +24,7 @@ export async function TraverseBlocks(cursor: string = '') {
 
   try {
     const BlockIndices = await RetrieveBlocks(SolarweaveConfig.parallelize, cursor);
-    const Blocks = [];
+    const BlockPromises = [];
     
     for (let i = 0; i < BlockIndices.length; i++) {
       const BlockIndex = BlockIndices[i];
@@ -36,11 +36,17 @@ export async function TraverseBlocks(cursor: string = '') {
         return { name: tag.name, value: tag.value };
       });
 
-      const Block = JSON.parse(await RetrieveBlock(ArweaveId));
-      const Slot = Number(BlockTags.filter(t => t.name === 'slot')[0].value);
+      const BlockPromise = new Promise(async resolve => {
+        const Block = JSON.parse(await RetrieveBlock(ArweaveId));
+        const Slot = Number(BlockTags.filter(t => t.name === 'slot')[0].value);
+  
+        return resolve({ Block, Slot });
+      });
 
-      Blocks.push({ Block, Slot });
+      BlockPromises.push(BlockPromise);
     }
+
+    const Blocks = (await Promise.all(BlockPromises)).filter(b => b !== null);    
 
     if (Blocks.length > 0) {
       const Error: string = await AddBlocksToCache(Blocks, 'index');
