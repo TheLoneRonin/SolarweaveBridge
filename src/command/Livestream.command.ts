@@ -30,7 +30,7 @@ export async function StreamBlocks(slot: number) {
         
         Log(`Livestream is at Block `.yellow + `${slot}`.yellow.bold +`, latest block is `.yellow + `${latestSlot}`.yellow.bold);
 
-        const ConfirmedBlocks = await GetConfirmedBlocks(slot, slot + 1000);
+        const ConfirmedBlocks = await GetConfirmedBlocks(slot, slot + SolarweaveConfig.parallelize * 10);
         const Slots = ConfirmedBlocks.body.result;
 
         if (latestSlot && Slots) {

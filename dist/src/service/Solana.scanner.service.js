@@ -136,7 +136,6 @@ function AddBlocksToCache(Blocks, type) {
                     return [3 /*break*/, 2];
                 case 6:
                     Arweave_service_1.SubmitBlocksToArweave(transactions, type);
-                    Log_util_1.Log(("The following Solana " + (type === 'index' ? 'Indexed Blocks' : 'Blocks') + " are pending submission with the Slots " + transactions.map(function (t) { return t.tags.slot; }) + " to Arweave\n").cyan);
                     _a.label = 7;
                 case 7:
                     Benchmark_util_1.LogBenchmark('cache_block');

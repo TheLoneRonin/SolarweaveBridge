@@ -30,7 +30,7 @@ export async function TraverseBlocks(slot: number) {
 
         Log(`Cache is at Block `.yellow + `${slot}`.yellow.bold +`, latest block is `.yellow + `${latestSlot ? latestSlot : 'Unknown (getSlot RPC Error)'}`.yellow.bold);
 
-        const ConfirmedBlocks = await GetConfirmedBlocks(slot, slot + 1000);
+        const ConfirmedBlocks = await GetConfirmedBlocks(slot, slot + SolarweaveConfig.parallelize * 10);
         const Slots = ConfirmedBlocks.body.result;
 
         if (Slots) {

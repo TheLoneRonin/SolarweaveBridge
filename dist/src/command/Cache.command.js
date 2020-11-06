@@ -82,7 +82,7 @@ function TraverseBlocks(slot) {
                     slotPayload = _a.sent();
                     latestSlot = slotPayload.body.result;
                     Log_util_1.Log("Cache is at Block ".yellow + ("" + slot).yellow.bold + ", latest block is ".yellow + ("" + (latestSlot ? latestSlot : 'Unknown (getSlot RPC Error)')).yellow.bold);
-                    return [4 /*yield*/, Solana_rpc_service_1.GetConfirmedBlocks(slot, slot + 1000)];
+                    return [4 /*yield*/, Solana_rpc_service_1.GetConfirmedBlocks(slot, slot + Config_1.SolarweaveConfig.parallelize * 10)];
                 case 3:
                     ConfirmedBlocks = _a.sent();
                     Slots = ConfirmedBlocks.body.result;
