@@ -70,7 +70,7 @@ function AddBlocksToCache(Blocks, type) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 9, , 10]);
+                    _a.trys.push([0, 8, , 9]);
                     if (!Config_1.SolarweaveConfig.local) return [3 /*break*/, 1];
                     File_1 = fs_jetpack_1.read(Config_1.SolarweaveConfig.localFile);
                     Data = File_1 ? JSON.parse(File_1) : [];
@@ -91,7 +91,7 @@ function AddBlocksToCache(Blocks, type) {
                         if (typeof state_1 === "object")
                             return [2 /*return*/, state_1.value];
                     }
-                    return [3 /*break*/, 8];
+                    return [3 /*break*/, 7];
                 case 1:
                     transactions = [];
                     i = 0;
@@ -134,17 +134,17 @@ function AddBlocksToCache(Blocks, type) {
                 case 5:
                     i++;
                     return [3 /*break*/, 2];
-                case 6: return [4 /*yield*/, Arweave_service_1.SubmitBlocksToArweave(transactions, type)];
+                case 6:
+                    Arweave_service_1.SubmitBlocksToArweave(transactions, type);
+                    Log_util_1.Log(("The following Solana " + (type === 'index' ? 'Indexed Blocks' : 'Blocks') + " are pending submission with the Slots " + transactions.map(function (t) { return t.tags.slot; }) + " to Arweave\n").cyan);
+                    _a.label = 7;
                 case 7:
-                    _a.sent();
-                    _a.label = 8;
-                case 8:
                     Benchmark_util_1.LogBenchmark('cache_block');
                     return [2 /*return*/, null];
-                case 9:
+                case 8:
                     error_1 = _a.sent();
                     return [2 /*return*/, (error_1.message)];
-                case 10: return [2 /*return*/];
+                case 9: return [2 /*return*/];
             }
         });
     });
@@ -153,54 +153,20 @@ exports.AddBlocksToCache = AddBlocksToCache;
 function CacheBlocks(Slots, type) {
     if (type === void 0) { type = 'standard'; }
     return __awaiter(this, void 0, void 0, function () {
-        var Blocks, Promises, _loop_2, i, Error_1;
-        var _this = this;
+        var Blocks, Result, i, Item, Block, Slot, Error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     Blocks = [];
-                    Promises = [];
-                    _loop_2 = function (i) {
-                        var Slot = Slots[i];
-                        Promises.push(new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
-                            var blockPayload, Block, blockPayload, Block;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (!(type === 'standard')) return [3 /*break*/, 2];
-                                        return [4 /*yield*/, Solana_rpc_service_1.GetBlock(Slot)];
-                                    case 1:
-                                        blockPayload = _a.sent();
-                                        Block = blockPayload.body.result;
-                                        if (!Block) {
-                                            Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
-                                        }
-                                        else {
-                                            Blocks.push({ Block: Block, Slot: Slot });
-                                        }
-                                        return [3 /*break*/, 4];
-                                    case 2: return [4 /*yield*/, ARQL_service_1.RetrieveSlot(Slot.toString())];
-                                    case 3:
-                                        blockPayload = _a.sent();
-                                        Block = blockPayload.BlockData;
-                                        if (!Block) {
-                                            Log_util_1.Log(("Solarweave could not retrieve the block data for " + Slot + ". Please double check that your validator has all slots available.").red);
-                                        }
-                                        else {
-                                            Blocks.push({ Block: Block, Slot: Slot });
-                                        }
-                                        _a.label = 4;
-                                    case 4: return [2 /*return*/, resolve()];
-                                }
-                            });
-                        }); }));
-                    };
-                    for (i = 0; i < Slots.length; i++) {
-                        _loop_2(i);
-                    }
-                    return [4 /*yield*/, Promise.all(Promises)];
+                    return [4 /*yield*/, Solana_rpc_service_1.GetBlocks(Slots)];
                 case 1:
-                    _a.sent();
+                    Result = _a.sent();
+                    for (i = 0; i < Result.body.length; i++) {
+                        Item = Result.body[i];
+                        Block = Item.result;
+                        Slot = Item.id;
+                        Blocks.push({ Block: Block, Slot: Slot });
+                    }
                     if (!(Blocks.length > 0)) return [3 /*break*/, 3];
                     return [4 /*yield*/, AddBlocksToCache(Blocks, type)];
                 case 2:

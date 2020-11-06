@@ -7,7 +7,7 @@ import { LogBenchmark } from '../util/Benchmark.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { SubmitBlocksToArweave } from './Arweave.service';
 import { RetrieveBlockhash, RetrieveSlot } from './ARQL.service';
-import { GetSlot, GetBlock } from './Solana.rpc.service';
+import { GetSlot, GetBlock, GetBlocks } from './Solana.rpc.service';
 
 export async function GetLatestBlock() {
     const slotPayload = await GetSlot();
@@ -81,7 +81,7 @@ export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promi
                 transactions.push(transaction);
             }
 
-            await SubmitBlocksToArweave(transactions, type);
+            SubmitBlocksToArweave(transactions, type);
         }
 
         LogBenchmark('cache_block');
@@ -94,34 +94,15 @@ export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promi
 
 export async function CacheBlocks(Slots: Array<number>, type: string = 'standard') {
     const Blocks = [];
-    const Promises = [];
+    const Result = await GetBlocks(Slots);
 
-    for (let i = 0; i < Slots.length; i++) {
-        const Slot = Slots[i];
+    for (let i = 0; i < Result.body.length; i++) {
+        const Item = Result.body[i];
+        const Block = Item.result;
+        const Slot = Item.id;
 
-        Promises.push(new Promise(async resolve => {
-            if (type === 'standard') {
-                const blockPayload = await GetBlock(Slot);
-                const Block = blockPayload.body.result;
-                if (!Block) {
-                    Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
-                } else {
-                    Blocks.push({ Block, Slot });
-                }   
-            } else {
-                const blockPayload = await RetrieveSlot(Slot.toString());
-                const Block = blockPayload.BlockData;
-                if (!Block) {
-                    Log(`Solarweave could not retrieve the block data for ${Slot}. Please double check that your validator has all slots available.`.red);
-                } else {
-                    Blocks.push({ Block, Slot });
-                } 
-            }   
-            return resolve();
-        }))  
+        Blocks.push({ Block, Slot });
     }
-
-    await Promise.all(Promises);
     
     if (Blocks.length > 0) {
         const Error: string = await AddBlocksToCache(Blocks, type);

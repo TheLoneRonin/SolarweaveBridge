@@ -55,7 +55,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetConfirmedBlocks = exports.GetBlock = exports.GetSlot = exports.GetFirstSlot = exports.GenesisHash = void 0;
+exports.GetConfirmedBlocks = exports.GetBlocks = exports.GetBlock = exports.GetSlot = exports.GetFirstSlot = exports.GenesisHash = void 0;
 var superagent = __importStar(require("superagent"));
 var Config_1 = require("../Config");
 function GenesisHash(id) {
@@ -142,6 +142,32 @@ function GetBlock(index, id) {
     });
 }
 exports.GetBlock = GetBlock;
+function GetBlocks(Slots) {
+    return __awaiter(this, void 0, void 0, function () {
+        var object, i, payload;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    object = [];
+                    for (i = 0; i < Slots.length; i++) {
+                        object.push({
+                            jsonrpc: Config_1.SolarweaveConfig.rpc_version,
+                            id: Slots[i],
+                            method: "getConfirmedBlock",
+                            params: [Slots[i]],
+                        });
+                    }
+                    return [4 /*yield*/, superagent
+                            .post(Config_1.SolarweaveConfig.url)
+                            .send(object)];
+                case 1:
+                    payload = _a.sent();
+                    return [2 /*return*/, payload];
+            }
+        });
+    });
+}
+exports.GetBlocks = GetBlocks;
 function GetConfirmedBlocks(start, end, id) {
     return __awaiter(this, void 0, void 0, function () {
         var payload;

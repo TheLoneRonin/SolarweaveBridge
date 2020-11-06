@@ -50,6 +50,25 @@ export async function GetBlock(index: number, id?: number) {
     return payload;
 }
 
+export async function GetBlocks(Slots: Array<number>) {
+    const object = [];
+
+    for (let i = 0; i < Slots.length; i++) {
+        object.push({
+            jsonrpc: SolarweaveConfig.rpc_version,
+            id: Slots[i],
+            method: `getConfirmedBlock`,
+            params: [Slots[i]],
+        });
+    }
+
+    const payload = await superagent
+        .post(SolarweaveConfig.url)
+        .send(object);
+
+    return payload;
+}
+
 export async function GetConfirmedBlocks(start: number, end: number, id?: number) {
     const payload = await superagent
         .post(SolarweaveConfig.url)

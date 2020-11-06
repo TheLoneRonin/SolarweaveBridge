@@ -1,6 +1,6 @@
 {
   "name": "@theronin/solarweave",
-  "version": "1.8.4",
+  "version": "1.9.0",
   "main": "dist/src/Solarweave.library.js",
   "repository": "https://github.com/TheLoneRonin/SolarweaveBridge.git",
   "license": "MIT",
