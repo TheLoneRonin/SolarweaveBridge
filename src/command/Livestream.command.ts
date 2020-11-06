@@ -47,7 +47,7 @@ export async function StreamBlocks(slot: number) {
                 write(`.solarweave.temp`, (lastSlot).toString());
             }
 
-            StreamBlocks(slot + Slots.length);
+            StreamBlocks(lastSlot);
         } else {
             if (slotPayload.body.error) {
                 Log(`RPC ERROR CODE ${slotPayload.body.error.code}: ${slotPayload.body.error.message}`.red.bold);

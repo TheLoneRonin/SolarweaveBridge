@@ -70,4 +70,11 @@ Solarweave
         Index();
     });
 
+Solarweave
+    .command('version')
+    .description('Get the current version of Solarweave')
+    .action(() => {
+        console.log(`Solarweave v1.9.2`.green.bold);
+    });
+
 Solarweave.parse(process.argv);

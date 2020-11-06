@@ -47,7 +47,13 @@ export async function TraverseBlocks(slot: number) {
                 write(`.solarweave.temp`, (lastSlot).toString());
             }
 
-            TraverseBlocks(lastSlot);
+            if (Slots.length > 0) {
+                TraverseBlocks(lastSlot);
+            } else {
+                Log(`Solarweave seems to be in sync, waiting a few seconds before querying again`.green);
+                await Sleep(5000);
+                TraverseBlocks(lastSlot);
+            }
         } else {
             if (slotPayload.body.error) {
                 Log(`RPC ERROR CODE ${slotPayload.body.error.code}: ${slotPayload.body.error.message}`.red.bold);

@@ -105,7 +105,7 @@ function StreamBlocks(slot) {
                     i += Config_1.SolarweaveConfig.parallelize;
                     return [3 /*break*/, 4];
                 case 7:
-                    StreamBlocks(slot + Slots.length);
+                    StreamBlocks(lastSlot);
                     return [3 /*break*/, 9];
                 case 8:
                     if (slotPayload.body.error) {

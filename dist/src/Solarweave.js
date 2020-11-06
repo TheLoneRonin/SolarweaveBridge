@@ -102,5 +102,11 @@ exports.Solarweave
     Command_util_1.ProcessCommand(exports.Solarweave);
     Index_command_1.Index();
 });
+exports.Solarweave
+    .command('version')
+    .description('Get the current version of Solarweave')
+    .action(function () {
+    console.log("Solarweave v1.9.2".green.bold);
+});
 exports.Solarweave.parse(process.argv);
 //# sourceMappingURL=Solarweave.js.map
