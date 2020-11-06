@@ -76,7 +76,7 @@ function StreamBlocks(slot) {
                     lastSlot = slot;
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 10, , 12]);
+                    _a.trys.push([1, 13, , 15]);
                     return [4 /*yield*/, Solana_rpc_service_1.GetSlot()];
                 case 2:
                     slotPayload = _a.sent();
@@ -86,7 +86,7 @@ function StreamBlocks(slot) {
                 case 3:
                     ConfirmedBlocks = _a.sent();
                     Slots = ConfirmedBlocks.body.result;
-                    if (!(latestSlot && Slots)) return [3 /*break*/, 8];
+                    if (!(latestSlot && Slots)) return [3 /*break*/, 11];
                     i = 0;
                     _a.label = 4;
                 case 4:
@@ -105,18 +105,27 @@ function StreamBlocks(slot) {
                     i += Config_1.SolarweaveConfig.parallelize;
                     return [3 /*break*/, 4];
                 case 7:
+                    if (!(Slots.length > 0)) return [3 /*break*/, 8];
                     StreamBlocks(lastSlot);
-                    return [3 /*break*/, 9];
+                    return [3 /*break*/, 10];
                 case 8:
+                    Log_util_1.Log("Solarweave seems to be in sync, waiting a few seconds before querying again".green);
+                    return [4 /*yield*/, Sleep_util_1.Sleep(5000)];
+                case 9:
+                    _a.sent();
+                    StreamBlocks(lastSlot);
+                    _a.label = 10;
+                case 10: return [3 /*break*/, 12];
+                case 11:
                     if (slotPayload.body.error) {
                         Log_util_1.Log(("RPC ERROR CODE " + slotPayload.body.error.code + ": " + slotPayload.body.error.message).red.bold);
                     }
                     else {
                         Log_util_1.Log("Could not retrieve slots".red.bold);
                     }
-                    _a.label = 9;
-                case 9: return [3 /*break*/, 12];
-                case 10:
+                    _a.label = 12;
+                case 12: return [3 /*break*/, 15];
+                case 13:
                     error_1 = _a.sent();
                     if (error_1.response) {
                         console.error(("RPC ERROR: " + error_1.response + "\n").red.bold);
@@ -126,11 +135,11 @@ function StreamBlocks(slot) {
                     }
                     Log_util_1.Log("Attempting to restart streaming service\n".yellow.bold);
                     return [4 /*yield*/, Sleep_util_1.Sleep(2500)];
-                case 11:
+                case 14:
                     _a.sent();
                     StreamBlocks(lastSlot);
-                    return [3 /*break*/, 12];
-                case 12: return [2 /*return*/];
+                    return [3 /*break*/, 15];
+                case 15: return [2 /*return*/];
             }
         });
     });

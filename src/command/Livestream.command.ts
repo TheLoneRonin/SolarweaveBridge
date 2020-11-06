@@ -47,7 +47,14 @@ export async function StreamBlocks(slot: number) {
                 write(`.solarweave.temp`, (lastSlot).toString());
             }
 
-            StreamBlocks(lastSlot);
+            if (Slots.length > 0) {
+                StreamBlocks(lastSlot);
+            } else {
+                Log(`Solarweave seems to be in sync, waiting a few seconds before querying again`.green);
+                await Sleep(5000);
+                StreamBlocks(lastSlot);
+            }
+            
         } else {
             if (slotPayload.body.error) {
                 Log(`RPC ERROR CODE ${slotPayload.body.error.code}: ${slotPayload.body.error.message}`.red.bold);
