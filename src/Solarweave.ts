@@ -27,7 +27,9 @@ Solarweave
     .option('--parallelize [blocks]', 'the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time', '1')
     .option('--benchmark', 'benchmark Solarweave and start tracking size and speed stats stored in benchmark.json', false)
     .option('--noverify', 'if caching to Arweave do not double check if the block was already submitted', false)
-    .option('--index', 'if caching to Arweave, index blocks according to signatures and account keys', false);
+    .option('--index', 'if caching to Arweave, index blocks according to signatures and account keys', false)
+    .option('--start [number]', 'the block number to start at')
+    .option('--end [number]', 'the block number to end at');
 
 
 Solarweave
@@ -74,7 +76,7 @@ Solarweave
     .command('version')
     .description('Get the current version of Solarweave')
     .action(() => {
-        console.log(`Solarweave v1.9.3`.green.bold);
+        console.log(`Solarweave v2.0.0`.green.bold);
     });
 
 Solarweave.parse(process.argv);

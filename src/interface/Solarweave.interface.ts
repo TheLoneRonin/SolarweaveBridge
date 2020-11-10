@@ -12,4 +12,6 @@ export interface SolarweaveInterface {
     benchmark: boolean;
     verify: boolean;
     index: boolean;
+    start?: number;
+    end?: number;
 };

@@ -33,6 +33,8 @@ export const SolarweaveConfig: SolarweaveInterface = {
     benchmark: false,
     verify: true,
     index: false,
+    start: null,
+    end: null,
 }
 
 export function UpdateConfig(
@@ -49,6 +51,8 @@ export function UpdateConfig(
     benchmark: boolean,
     verify: boolean,
     index: boolean,
+    start?: number,
+    end?: number,
 ) {
     SolarweaveConfig.rpc_version = rpc_version;
     SolarweaveConfig.database = database;
@@ -63,4 +67,6 @@ export function UpdateConfig(
     SolarweaveConfig.benchmark = benchmark;
     SolarweaveConfig.verify = verify;
     SolarweaveConfig.index = index;
+    SolarweaveConfig.start = start;
+    SolarweaveConfig.end = end;
 }

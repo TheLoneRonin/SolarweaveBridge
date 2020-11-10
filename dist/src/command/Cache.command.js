@@ -50,18 +50,23 @@ function Cache() {
             switch (_a.label) {
                 case 0:
                     File = fs_jetpack_1.read(".solarweave.temp");
-                    if (!File) return [3 /*break*/, 1];
+                    if (!(Config_1.SolarweaveConfig.start && !isNaN(Config_1.SolarweaveConfig.start))) return [3 /*break*/, 1];
+                    Log_util_1.Log(("Starting Solarweave at Block #" + Config_1.SolarweaveConfig.start + "\n").yellow.bold);
+                    TraverseBlocks(Config_1.SolarweaveConfig.start);
+                    return [3 /*break*/, 4];
+                case 1:
+                    if (!File) return [3 /*break*/, 2];
                     Log_util_1.Log('An existing temp cache was found, restarting the cache process\n'.yellow.bold);
                     slot = Number(File);
                     TraverseBlocks(slot);
-                    return [3 /*break*/, 3];
-                case 1: return [4 /*yield*/, Solana_rpc_service_1.GetFirstSlot()];
-                case 2:
+                    return [3 /*break*/, 4];
+                case 2: return [4 /*yield*/, Solana_rpc_service_1.GetFirstSlot()];
+                case 3:
                     slotPayload = _a.sent();
                     slot = slotPayload.body.result;
                     TraverseBlocks(slot);
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -69,7 +74,7 @@ function Cache() {
 exports.Cache = Cache;
 function TraverseBlocks(slot) {
     return __awaiter(this, void 0, void 0, function () {
-        var lastSlot, slotPayload, latestSlot, ConfirmedBlocks, Slots, i, PromisedSlots, j, error_1;
+        var lastSlot, slotPayload, latestSlot, EndSlot, end, ConfirmedBlocks, Slots, i, PromisedSlots, j, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -82,7 +87,13 @@ function TraverseBlocks(slot) {
                     slotPayload = _a.sent();
                     latestSlot = slotPayload.body.result;
                     Log_util_1.Log("Cache is at Block ".yellow + ("" + slot).yellow.bold + ", latest block is ".yellow + ("" + (latestSlot ? latestSlot : 'Unknown (getSlot RPC Error)')).yellow.bold);
-                    return [4 /*yield*/, Solana_rpc_service_1.GetConfirmedBlocks(slot, slot + Config_1.SolarweaveConfig.parallelize * 10)];
+                    EndSlot = slot + Config_1.SolarweaveConfig.parallelize * 10;
+                    end = false;
+                    if (Config_1.SolarweaveConfig.end && !isNaN(Config_1.SolarweaveConfig.end) && EndSlot > Config_1.SolarweaveConfig.end) {
+                        EndSlot = Config_1.SolarweaveConfig.end;
+                        end = true;
+                    }
+                    return [4 /*yield*/, Solana_rpc_service_1.GetConfirmedBlocks(slot, EndSlot)];
                 case 3:
                     ConfirmedBlocks = _a.sent();
                     Slots = ConfirmedBlocks.body.result;
@@ -105,11 +116,15 @@ function TraverseBlocks(slot) {
                     i += Config_1.SolarweaveConfig.parallelize;
                     return [3 /*break*/, 4];
                 case 7:
+                    if (end) {
+                        Log_util_1.Log("Solarweave has reached your specified end block, now exiting".green);
+                        process.exit();
+                    }
                     if (!(Slots.length > 0)) return [3 /*break*/, 8];
                     TraverseBlocks(lastSlot);
                     return [3 /*break*/, 10];
                 case 8:
-                    Log_util_1.Log("Solarweave seems to be in sync, waiting a few seconds before querying again".green);
+                    Log_util_1.Log("Solarweave did not retrieve any blocks on the last query, waiting a few seconds before querying again".blue);
                     return [4 /*yield*/, Sleep_util_1.Sleep(5000)];
                 case 9:
                     _a.sent();

@@ -81,7 +81,7 @@ export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promi
                 transactions.push(transaction);
             }
 
-            SubmitBlocksToArweave(transactions, type);
+            await SubmitBlocksToArweave(transactions, type);
         }
 
         LogBenchmark('cache_block');

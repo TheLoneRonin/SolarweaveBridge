@@ -70,7 +70,7 @@ function AddBlocksToCache(Blocks, type) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 8, , 9]);
+                    _a.trys.push([0, 9, , 10]);
                     if (!Config_1.SolarweaveConfig.local) return [3 /*break*/, 1];
                     File_1 = fs_jetpack_1.read(Config_1.SolarweaveConfig.localFile);
                     Data = File_1 ? JSON.parse(File_1) : [];
@@ -91,7 +91,7 @@ function AddBlocksToCache(Blocks, type) {
                         if (typeof state_1 === "object")
                             return [2 /*return*/, state_1.value];
                     }
-                    return [3 /*break*/, 7];
+                    return [3 /*break*/, 8];
                 case 1:
                     transactions = [];
                     i = 0;
@@ -134,16 +134,17 @@ function AddBlocksToCache(Blocks, type) {
                 case 5:
                     i++;
                     return [3 /*break*/, 2];
-                case 6:
-                    Arweave_service_1.SubmitBlocksToArweave(transactions, type);
-                    _a.label = 7;
+                case 6: return [4 /*yield*/, Arweave_service_1.SubmitBlocksToArweave(transactions, type)];
                 case 7:
+                    _a.sent();
+                    _a.label = 8;
+                case 8:
                     Benchmark_util_1.LogBenchmark('cache_block');
                     return [2 /*return*/, null];
-                case 8:
+                case 9:
                     error_1 = _a.sent();
                     return [2 /*return*/, (error_1.message)];
-                case 9: return [2 /*return*/];
+                case 10: return [2 /*return*/];
             }
         });
     });

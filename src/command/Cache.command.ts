@@ -9,8 +9,10 @@ import { CacheBlocks } from '../service/Solana.scanner.service';
 
 export async function Cache() {
     const File = read(`.solarweave.temp`);
-
-    if (File) {
+    if (SolarweaveConfig.start && !isNaN(SolarweaveConfig.start)) {
+        Log(`Starting Solarweave at Block #${SolarweaveConfig.start}\n`.yellow.bold);
+        TraverseBlocks(SolarweaveConfig.start);
+    } else if (File) {
         Log('An existing temp cache was found, restarting the cache process\n'.yellow.bold);
         const slot: number = Number(File);
         TraverseBlocks(slot);
@@ -30,7 +32,14 @@ export async function TraverseBlocks(slot: number) {
 
         Log(`Cache is at Block `.yellow + `${slot}`.yellow.bold +`, latest block is `.yellow + `${latestSlot ? latestSlot : 'Unknown (getSlot RPC Error)'}`.yellow.bold);
 
-        const ConfirmedBlocks = await GetConfirmedBlocks(slot, slot + SolarweaveConfig.parallelize * 10);
+        let EndSlot = slot + SolarweaveConfig.parallelize * 10;
+        let end = false;
+        if (SolarweaveConfig.end && !isNaN(SolarweaveConfig.end) && EndSlot > SolarweaveConfig.end) {
+            EndSlot = SolarweaveConfig.end;
+            end = true;
+        }
+
+        const ConfirmedBlocks = await GetConfirmedBlocks(slot, EndSlot);
         const Slots = ConfirmedBlocks.body.result;
 
         if (Slots) {
@@ -47,10 +56,15 @@ export async function TraverseBlocks(slot: number) {
                 write(`.solarweave.temp`, (lastSlot).toString());
             }
 
+            if (end) {
+                Log(`Solarweave has reached your specified end block, now exiting`.green);
+                process.exit();
+            }
+
             if (Slots.length > 0) {
                 TraverseBlocks(lastSlot);
             } else {
-                Log(`Solarweave seems to be in sync, waiting a few seconds before querying again`.green);
+                Log(`Solarweave did not retrieve any blocks on the last query, waiting a few seconds before querying again`.blue);
                 await Sleep(5000);
                 TraverseBlocks(lastSlot);
             }

@@ -59,6 +59,8 @@ Options:
   --benchmark                benchmark Solarweave and start tracking size and speed stats stored in benchmark.json (default: false)
   --noverify                 if caching to Arweave do not double check if the block was already submitted (default: false)
   --index                    if caching to Arweave, index blocks according to signatures and account keys (default: false)
+  --start [number]           the block number to start at
+  --end [number]             the block number to end at
   -h, --help                 display help for command
 
 Commands:
@@ -67,6 +69,7 @@ Commands:
   livestream                 livestream blocks directly to your arweave database (or locally)
   cache                      retrieve all the blocks that are still available and store them in Arweave
   index                      index an existing database with their Account Keys and Signatures
+  version                    Get the current version of Solarweave
   help [command]             display help for command
 ```
 
@@ -233,6 +236,23 @@ If you wanted to index blocks by both signature and account key. You can use pas
 ```bash
 $ solarweave --index
 ```
+
+#### Start at a specific block
+
+If you want to start at a specific block, use the `--start` flag
+
+```bash
+$ solarweave --start 100
+```
+
+#### End at a specific block
+
+If you want to end the process at a specific block, use the `--end` flag
+
+```bash
+$ solarweave --end 100
+```
+
 
 ----
 
