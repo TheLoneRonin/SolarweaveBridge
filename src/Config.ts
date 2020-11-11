@@ -30,6 +30,7 @@ export const SolarweaveConfig: SolarweaveInterface = {
     console: true,
     compressed: true,
     parallelize: 1,
+    batch: 1,
     benchmark: false,
     verify: true,
     index: false,
@@ -48,6 +49,7 @@ export function UpdateConfig(
     console: boolean,
     compressed: boolean,
     parallelize: number,
+    batch: number,
     benchmark: boolean,
     verify: boolean,
     index: boolean,
@@ -64,6 +66,7 @@ export function UpdateConfig(
     SolarweaveConfig.console = console;
     SolarweaveConfig.compressed = compressed;
     SolarweaveConfig.parallelize = parallelize;
+    SolarweaveConfig.batch = batch;
     SolarweaveConfig.benchmark = benchmark;
     SolarweaveConfig.verify = verify;
     SolarweaveConfig.index = index;

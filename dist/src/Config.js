@@ -30,13 +30,14 @@ exports.SolarweaveConfig = {
     console: true,
     compressed: true,
     parallelize: 1,
+    batch: 1,
     benchmark: false,
     verify: true,
     index: false,
     start: null,
     end: null,
 };
-function UpdateConfig(rpc_version, database, arweaveGraphQL, url, credentials, local, localFile, console, compressed, parallelize, benchmark, verify, index, start, end) {
+function UpdateConfig(rpc_version, database, arweaveGraphQL, url, credentials, local, localFile, console, compressed, parallelize, batch, benchmark, verify, index, start, end) {
     exports.SolarweaveConfig.rpc_version = rpc_version;
     exports.SolarweaveConfig.database = database;
     exports.SolarweaveConfig.arweaveGraphQL = arweaveGraphQL;
@@ -47,6 +48,7 @@ function UpdateConfig(rpc_version, database, arweaveGraphQL, url, credentials, l
     exports.SolarweaveConfig.console = console;
     exports.SolarweaveConfig.compressed = compressed;
     exports.SolarweaveConfig.parallelize = parallelize;
+    exports.SolarweaveConfig.batch = batch;
     exports.SolarweaveConfig.benchmark = benchmark;
     exports.SolarweaveConfig.verify = verify;
     exports.SolarweaveConfig.index = index;

@@ -46,7 +46,7 @@ function CompressBlock(Block) {
         var buffer, compressed, compressedString;
         return __generator(this, function (_a) {
             buffer = Buffer.from(JSON.stringify(Block), 'utf-8');
-            compressed = zlib_1.default.deflateSync(buffer);
+            compressed = zlib_1.default.deflateSync(buffer, { level: 9 });
             compressedString = compressed.toString('base64');
             return [2 /*return*/, compressedString];
         });

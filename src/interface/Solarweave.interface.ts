@@ -9,6 +9,7 @@ export interface SolarweaveInterface {
     console: boolean;
     compressed: boolean;
     parallelize: number;
+    batch: number;
     benchmark: boolean;
     verify: boolean;
     index: boolean;

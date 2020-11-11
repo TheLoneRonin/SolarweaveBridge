@@ -33,7 +33,7 @@ export async function StreamBlocks(slot: number) {
         
         Log(`Livestream is at Block `.yellow + `${slot}`.yellow.bold +`, latest block is `.yellow + `${latestSlot}`.yellow.bold);
 
-        let EndSlot = slot + SolarweaveConfig.parallelize * 10;
+        let EndSlot = slot + (SolarweaveConfig.parallelize * SolarweaveConfig.batch) - 1;
         let end = false;
         if (SolarweaveConfig.end && !isNaN(SolarweaveConfig.end) && EndSlot > SolarweaveConfig.end) {
             EndSlot = SolarweaveConfig.end;
@@ -44,18 +44,18 @@ export async function StreamBlocks(slot: number) {
         const Slots = ConfirmedBlocks.body.result;
 
         if (latestSlot && Slots) {
-            for (let i = 0; i < Slots.length; i += SolarweaveConfig.parallelize) {
+            for (let i = 0; i < Slots.length; i += (SolarweaveConfig.parallelize * SolarweaveConfig.batch)) {
                 const PromisedSlots = [];
                 
-                for (let j = 0; j < SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
+                for (let j = 0; j < (SolarweaveConfig.parallelize * SolarweaveConfig.batch) && i + j < Slots.length; j++) {
                     PromisedSlots.push(Slots[i + j]);
                 }
 
                 await CacheBlocks(PromisedSlots);
-                
-                lastSlot = Slots[i];
-                write(`.solarweave.temp`, (lastSlot).toString());
             }
+
+            lastSlot = Slots[Slots.length - 1] + 1;
+            write(`.solarweave.temp`, (lastSlot).toString());
 
             if (end) {
                 Log(`Solarweave has reached your specified end block, now exiting`.green);

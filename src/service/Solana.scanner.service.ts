@@ -92,22 +92,38 @@ export async function AddBlocksToCache(Blocks, type: string = 'standard'): Promi
     }
 }
 
+export function BatchSlots(Slots: Array<number>, size: number): Array<Array<number>> {
+    const Batches = [];
+    
+    for (let i = 0; i < Slots.length; i += size) {
+        const batch = Slots.slice(i, i + size);
+        Batches.push(batch);
+    }
+
+    return Batches;
+}
+
 export async function CacheBlocks(Slots: Array<number>, type: string = 'standard') {
+    const Batches = BatchSlots(Slots, Math.ceil(Slots.length / SolarweaveConfig.batch));
     const Blocks = [];
-    const Result = await GetBlocks(Slots);
 
-    for (let i = 0; i < Result.body.length; i++) {
-        const Item = Result.body[i];
-        const Block = Item.result;
-        const Slot = Item.id;
+    for (let i = 0; i < Batches.length; i++) {
+        const Batch = Batches[i];
+        const Result = await GetBlocks(Batch);
 
-        Blocks.push({ Block, Slot });
+        for (let ii = 0; ii < Result.body.length; ii++) {
+            const Item = Result.body[ii];
+            const Block = Item.result;
+            const Slot = Item.id;
+    
+            Blocks.push({ Block, Slot });
+        }
     }
     
     if (Blocks.length > 0) {
         const Error: string = await AddBlocksToCache(Blocks, type);
         if (Error) { Log(Error) }
     } else {
-        Log(`Solarweave is now in sync with the latest block`.yellow);
+        Log(`Solarweave did not submit any blocks to Arweave on the last query`.yellow);
     }
 }

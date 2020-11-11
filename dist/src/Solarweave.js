@@ -61,6 +61,7 @@ exports.Solarweave
     .option('--console', 'do not output log data to console', false)
     .option('--uncompressed', 'store blocks in an uncompressed format', false)
     .option('--parallelize [blocks]', 'the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time', '1')
+    .option('--batch [number]', 'the number of requests to batch per Arweave transaction', '1')
     .option('--benchmark', 'benchmark Solarweave and start tracking size and speed stats stored in benchmark.json', false)
     .option('--noverify', 'if caching to Arweave do not double check if the block was already submitted', false)
     .option('--index', 'if caching to Arweave, index blocks according to signatures and account keys', false)
@@ -108,7 +109,7 @@ exports.Solarweave
     .command('version')
     .description('Get the current version of Solarweave')
     .action(function () {
-    console.log("Solarweave v2.0.0".green.bold);
+    console.log("Solarweave v2.1.0".green.bold);
 });
 exports.Solarweave.parse(process.argv);
 //# sourceMappingURL=Solarweave.js.map

@@ -22,7 +22,7 @@ describe('Config Tests', function () {
         assert_1.equal(Config_1.SolarweaveConfig.index, true);
     });
     it('Should be able to update the Solarweave Config', function () {
-        Config_1.UpdateConfig('2.0', 'solarweave-devnet', 'https://arweave.dev/graphql', 'https://devnet.solana.com', '.arweave.creds.json', false, 'solarweave.cache.json', true, true, 1, false, true, false);
+        Config_1.UpdateConfig('2.0', 'solarweave-devnet', 'https://arweave.dev/graphql', 'https://devnet.solana.com', '.arweave.creds.json', false, 'solarweave.cache.json', true, true, 1, 1, false, true, false);
     });
 });
 //# sourceMappingURL=Config.test.js.map

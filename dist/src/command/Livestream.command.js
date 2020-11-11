@@ -87,7 +87,7 @@ function StreamBlocks(slot) {
                     slotPayload = _a.sent();
                     latestSlot = slotPayload.body.result;
                     Log_util_1.Log("Livestream is at Block ".yellow + ("" + slot).yellow.bold + ", latest block is ".yellow + ("" + latestSlot).yellow.bold);
-                    EndSlot = slot + Config_1.SolarweaveConfig.parallelize * 10;
+                    EndSlot = slot + (Config_1.SolarweaveConfig.parallelize * Config_1.SolarweaveConfig.batch) - 1;
                     end = false;
                     if (Config_1.SolarweaveConfig.end && !isNaN(Config_1.SolarweaveConfig.end) && EndSlot > Config_1.SolarweaveConfig.end) {
                         EndSlot = Config_1.SolarweaveConfig.end;
@@ -103,19 +103,19 @@ function StreamBlocks(slot) {
                 case 4:
                     if (!(i < Slots.length)) return [3 /*break*/, 7];
                     PromisedSlots = [];
-                    for (j = 0; j < Config_1.SolarweaveConfig.parallelize && i + j < Slots.length; j++) {
+                    for (j = 0; j < (Config_1.SolarweaveConfig.parallelize * Config_1.SolarweaveConfig.batch) && i + j < Slots.length; j++) {
                         PromisedSlots.push(Slots[i + j]);
                     }
                     return [4 /*yield*/, Solana_scanner_service_1.CacheBlocks(PromisedSlots)];
                 case 5:
                     _a.sent();
-                    lastSlot = Slots[i];
-                    fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
                     _a.label = 6;
                 case 6:
-                    i += Config_1.SolarweaveConfig.parallelize;
+                    i += (Config_1.SolarweaveConfig.parallelize * Config_1.SolarweaveConfig.batch);
                     return [3 /*break*/, 4];
                 case 7:
+                    lastSlot = Slots[Slots.length - 1] + 1;
+                    fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
                     if (end) {
                         Log_util_1.Log("Solarweave has reached your specified end block, now exiting".green);
                         process.exit();

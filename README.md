@@ -56,6 +56,7 @@ Options:
   --console                  do not output log data to console (default: false)
   --uncompressed             store blocks in an uncompressed format (default: false)
   --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")
+  --batch [number]           the number of requests to batch per Arweave transaction (default: "1")
   --benchmark                benchmark Solarweave and start tracking size and speed stats stored in benchmark.json (default: false)
   --noverify                 if caching to Arweave do not double check if the block was already submitted (default: false)
   --index                    if caching to Arweave, index blocks according to signatures and account keys (default: false)
@@ -209,6 +210,18 @@ You can change the rate and speed at which Solarweave processes blocks by using 
 
 ```bash
 $ solarweave --parallelize 8
+```
+
+#### Batching Queries
+
+You can also improve performance by batching queries using the `--batch` flag. The number you specify is the `--parallelize` flag multiplied by the batch number. An example use case is as follows:
+
+```bash
+# Query 500 blocks in 5 requests
+$ solarweave --parallelize 100 --batch 5
+
+# Query 1000 blocks in 4 requests
+$ solarweave --parallelize 250 --batch 4 
 ```
 
 #### Benchmarking

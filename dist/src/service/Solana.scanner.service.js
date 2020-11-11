@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CacheBlocks = exports.AddBlocksToCache = exports.GetLatestBlock = void 0;
+exports.CacheBlocks = exports.BatchSlots = exports.AddBlocksToCache = exports.GetLatestBlock = void 0;
 var fs_jetpack_1 = require("fs-jetpack");
 var Config_1 = require("../Config");
 var Log_util_1 = require("../util/Log.util");
@@ -150,35 +150,55 @@ function AddBlocksToCache(Blocks, type) {
     });
 }
 exports.AddBlocksToCache = AddBlocksToCache;
+function BatchSlots(Slots, size) {
+    var Batches = [];
+    for (var i = 0; i < Slots.length; i += size) {
+        var batch = Slots.slice(i, i + size);
+        Batches.push(batch);
+    }
+    return Batches;
+}
+exports.BatchSlots = BatchSlots;
 function CacheBlocks(Slots, type) {
     if (type === void 0) { type = 'standard'; }
     return __awaiter(this, void 0, void 0, function () {
-        var Blocks, Result, i, Item, Block, Slot, Error_1;
+        var Batches, Blocks, i, Batch, Result, ii, Item, Block, Slot, Error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    Batches = BatchSlots(Slots, Math.ceil(Slots.length / Config_1.SolarweaveConfig.batch));
                     Blocks = [];
-                    return [4 /*yield*/, Solana_rpc_service_1.GetBlocks(Slots)];
+                    i = 0;
+                    _a.label = 1;
                 case 1:
+                    if (!(i < Batches.length)) return [3 /*break*/, 4];
+                    Batch = Batches[i];
+                    return [4 /*yield*/, Solana_rpc_service_1.GetBlocks(Batch)];
+                case 2:
                     Result = _a.sent();
-                    for (i = 0; i < Result.body.length; i++) {
-                        Item = Result.body[i];
+                    for (ii = 0; ii < Result.body.length; ii++) {
+                        Item = Result.body[ii];
                         Block = Item.result;
                         Slot = Item.id;
                         Blocks.push({ Block: Block, Slot: Slot });
                     }
-                    if (!(Blocks.length > 0)) return [3 /*break*/, 3];
+                    _a.label = 3;
+                case 3:
+                    i++;
+                    return [3 /*break*/, 1];
+                case 4:
+                    if (!(Blocks.length > 0)) return [3 /*break*/, 6];
                     return [4 /*yield*/, AddBlocksToCache(Blocks, type)];
-                case 2:
+                case 5:
                     Error_1 = _a.sent();
                     if (Error_1) {
                         Log_util_1.Log(Error_1);
                     }
-                    return [3 /*break*/, 4];
-                case 3:
-                    Log_util_1.Log("Solarweave is now in sync with the latest block".yellow);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 6:
+                    Log_util_1.Log("Solarweave did not submit any blocks to Arweave on the last query".yellow);
+                    _a.label = 7;
+                case 7: return [2 /*return*/];
             }
         });
     });
