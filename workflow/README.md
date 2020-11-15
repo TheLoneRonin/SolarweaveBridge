@@ -2,6 +2,8 @@
 
 This folder contains example workflows in Typescript to interact with Solarweave's caching interface via a library.
 
+Read the sync guide for testnet and mainnet [here](./SYNC.md).
+
 #### Configuration
 
 Workflows are fairly straight forward. The only thing you need to be mindful of is configuring Solarweave for your streaming needs.
