@@ -54,8 +54,10 @@ export async function StreamBlocks(slot: number) {
                 await CacheBlocks(PromisedSlots);
             }
 
-            lastSlot = Slots[Slots.length - 1] + 1;
-            write(`.solarweave.temp`, (lastSlot).toString());
+            if (!isNaN(Slots[Slots.length - 1])) {
+                lastSlot = Slots[Slots.length - 1] + 1;
+                write(`.solarweave.temp`, (lastSlot).toString());
+            }
 
             if (end) {
                 Log(`Solarweave has reached your specified end block, now exiting`.green);

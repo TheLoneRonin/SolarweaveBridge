@@ -114,8 +114,10 @@ function TraverseBlocks(slot) {
                     i += (Config_1.SolarweaveConfig.parallelize * Config_1.SolarweaveConfig.batch);
                     return [3 /*break*/, 4];
                 case 7:
-                    lastSlot = Slots[Slots.length - 1] + 1;
-                    fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
+                    if (!isNaN(Slots[Slots.length - 1])) {
+                        lastSlot = Slots[Slots.length - 1] + 1;
+                        fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
+                    }
                     if (end) {
                         Log_util_1.Log("Solarweave has reached your specified end block, now exiting".green);
                         process.exit();

@@ -19,10 +19,16 @@ console.log(`Estimated time in ms to query latest block`, `${BlockTime}ms`.green
 CacheBench('p1', 1);
 CacheBench('p4', 4);
 CacheBench('p8', 8);
+CacheBench('p25', 25);
+CacheBench('p50', 50);
+CacheBench('p100', 100);
 
 LivestreamBench('p1', 1);
 LivestreamBench('p4', 4);
 LivestreamBench('p8', 8);
+LivestreamBench('p25', 25);
+LivestreamBench('p50', 50);
+LivestreamBench('p100', 100);
 
 function CacheBench(p: string, divisor: number) {
     const Cache1 = JSON.parse(read(`${__dirname}/../../benchmarks/benchmark.cache.${p}.json`));
