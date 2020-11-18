@@ -51,12 +51,18 @@ export async function StreamBlocks(slot: number) {
                     PromisedSlots.push(Slots[i + j]);
                 }
 
-                await CacheBlocks(PromisedSlots);
+                if (PromisedSlots.length > 0) {
+                    await CacheBlocks(PromisedSlots);
+                }
             }
 
             if (!isNaN(Slots[Slots.length - 1])) {
                 lastSlot = Slots[Slots.length - 1] + 1;
                 write(`.solarweave.temp`, (lastSlot).toString());
+            }
+
+            if (!Slots || Slots.length === 0) {
+                throw new Error('Could not retrieve slots');
             }
 
             if (end) {

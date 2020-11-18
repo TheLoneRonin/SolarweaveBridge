@@ -77,7 +77,7 @@ Solarweave
     .command('version')
     .description('Get the current version of Solarweave')
     .action(() => {
-        console.log(`Solarweave v2.1.1`.green.bold);
+        console.log(`Solarweave v2.1.2`.green.bold);
     });
 
 Solarweave.parse(process.argv);

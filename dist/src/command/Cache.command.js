@@ -106,6 +106,7 @@ function TraverseBlocks(slot) {
                     for (j = 0; j < (Config_1.SolarweaveConfig.parallelize * Config_1.SolarweaveConfig.batch) && i + j < Slots.length; j++) {
                         PromisedSlots.push(Slots[i + j]);
                     }
+                    if (!(PromisedSlots.length > 0)) return [3 /*break*/, 6];
                     return [4 /*yield*/, Solana_scanner_service_1.CacheBlocks(PromisedSlots)];
                 case 5:
                     _a.sent();
@@ -117,6 +118,9 @@ function TraverseBlocks(slot) {
                     if (!isNaN(Slots[Slots.length - 1])) {
                         lastSlot = Slots[Slots.length - 1] + 1;
                         fs_jetpack_1.write(".solarweave.temp", (lastSlot).toString());
+                    }
+                    if (!Slots || Slots.length === 0) {
+                        throw new Error('Could not retrieve slots');
                     }
                     if (end) {
                         Log_util_1.Log("Solarweave has reached your specified end block, now exiting".green);

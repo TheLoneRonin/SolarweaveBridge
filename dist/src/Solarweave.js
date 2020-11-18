@@ -109,7 +109,7 @@ exports.Solarweave
     .command('version')
     .description('Get the current version of Solarweave')
     .action(function () {
-    console.log("Solarweave v2.1.1".green.bold);
+    console.log("Solarweave v2.1.2".green.bold);
 });
 exports.Solarweave.parse(process.argv);
 //# sourceMappingURL=Solarweave.js.map
