@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -56,23 +37,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetConfirmedBlocks = exports.GetBlocks = exports.GetBlock = exports.GetSlot = exports.GetFirstSlot = exports.GenesisHash = void 0;
-var superagent = __importStar(require("superagent"));
+var superagent_1 = require("superagent");
 var Config_1 = require("../Config");
+var Log_util_1 = require("../util/Log.util");
 function GenesisHash(id) {
     if (id === void 0) { id = 1; }
     return __awaiter(this, void 0, void 0, function () {
-        var payload;
+        var request, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, superagent
-                        .post(Config_1.SolarweaveConfig.url)
-                        .send({
+                case 0:
+                    request = {
                         jsonrpc: Config_1.SolarweaveConfig.rpc_version,
                         id: id,
                         method: "getGenesisHash",
-                    })];
+                    };
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(request)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getGenesisHash', request, payload);
                     return [2 /*return*/, payload];
             }
         });
@@ -82,18 +65,19 @@ exports.GenesisHash = GenesisHash;
 function GetFirstSlot(id) {
     if (id === void 0) { id = 1; }
     return __awaiter(this, void 0, void 0, function () {
-        var payload;
+        var request, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, superagent
-                        .post(Config_1.SolarweaveConfig.url)
-                        .send({
+                case 0:
+                    request = {
                         jsonrpc: Config_1.SolarweaveConfig.rpc_version,
                         id: id,
                         method: "getFirstAvailableBlock",
-                    })];
+                    };
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(request)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getFirstAvailableBlock', request, payload);
                     return [2 /*return*/, payload];
             }
         });
@@ -103,18 +87,19 @@ exports.GetFirstSlot = GetFirstSlot;
 function GetSlot(id) {
     if (id === void 0) { id = 1; }
     return __awaiter(this, void 0, void 0, function () {
-        var payload;
+        var request, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, superagent
-                        .post(Config_1.SolarweaveConfig.url)
-                        .send({
+                case 0:
+                    request = {
                         jsonrpc: Config_1.SolarweaveConfig.rpc_version,
                         id: id,
                         method: "getSlot",
-                    })];
+                    };
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(request)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getSlot', request, payload);
                     return [2 /*return*/, payload];
             }
         });
@@ -123,19 +108,20 @@ function GetSlot(id) {
 exports.GetSlot = GetSlot;
 function GetBlock(index, id) {
     return __awaiter(this, void 0, void 0, function () {
-        var payload;
+        var request, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, superagent
-                        .post(Config_1.SolarweaveConfig.url)
-                        .send({
+                case 0:
+                    request = {
                         jsonrpc: Config_1.SolarweaveConfig.rpc_version,
                         id: (id ? id : index),
                         method: "getConfirmedBlock",
                         params: [index],
-                    })];
+                    };
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(request)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getConfirmedBlock', request, payload);
                     return [2 /*return*/, payload];
             }
         });
@@ -157,11 +143,10 @@ function GetBlocks(Slots) {
                             params: [Slots[i]],
                         });
                     }
-                    return [4 /*yield*/, superagent
-                            .post(Config_1.SolarweaveConfig.url)
-                            .send(object)];
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(object)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getConfirmedBlock', object, payload);
                     return [2 /*return*/, payload];
             }
         });
@@ -170,19 +155,20 @@ function GetBlocks(Slots) {
 exports.GetBlocks = GetBlocks;
 function GetConfirmedBlocks(start, end, id) {
     return __awaiter(this, void 0, void 0, function () {
-        var payload;
+        var request, payload;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, superagent
-                        .post(Config_1.SolarweaveConfig.url)
-                        .send({
+                case 0:
+                    request = {
                         jsonrpc: Config_1.SolarweaveConfig.rpc_version,
                         id: (id ? id : start),
                         method: "getConfirmedBlocks",
                         params: [start, end],
-                    })];
+                    };
+                    return [4 /*yield*/, superagent_1.post(Config_1.SolarweaveConfig.url).send(request)];
                 case 1:
                     payload = _a.sent();
+                    Log_util_1.LogRequest('getConfirmedBlocks', request, payload);
                     return [2 /*return*/, payload];
             }
         });

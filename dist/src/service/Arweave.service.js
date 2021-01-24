@@ -75,30 +75,30 @@ exports.GetBalance = GetBalance;
 function SubmitBlocksToArweave(transactions, type) {
     if (type === void 0) { type = 'standard'; }
     return __awaiter(this, void 0, void 0, function () {
-        var key, bundles, i, transaction, bundledItem, bundledIndices, _a, bundledIndices, data, tx;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var key, bundles, i, transaction, bundledItem, bundledIndices, _a, bundledIndices, data, tx, _b, status, statusText;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0: return [4 /*yield*/, LoadWallet()];
                 case 1:
-                    key = _b.sent();
+                    key = _c.sent();
                     bundles = [];
                     i = 0;
-                    _b.label = 2;
+                    _c.label = 2;
                 case 2:
                     if (!(i < transactions.length)) return [3 /*break*/, 10];
                     transaction = transactions[i];
                     if (!(type === 'standard')) return [3 /*break*/, 7];
                     return [4 /*yield*/, BundleItem(transaction, key)];
                 case 3:
-                    bundledItem = _b.sent();
+                    bundledItem = _c.sent();
                     if (!Config_1.SolarweaveConfig.index) return [3 /*break*/, 5];
                     return [4 /*yield*/, BundleIndices(transaction, key)];
                 case 4:
-                    _a = _b.sent();
+                    _a = _c.sent();
                     return [3 /*break*/, 6];
                 case 5:
                     _a = [];
-                    _b.label = 6;
+                    _c.label = 6;
                 case 6:
                     bundledIndices = _a;
                     bundles = bundles.concat(bundledItem, bundledIndices);
@@ -107,28 +107,29 @@ function SubmitBlocksToArweave(transactions, type) {
                     if (!(type === 'index')) return [3 /*break*/, 9];
                     return [4 /*yield*/, BundleIndices(transaction, key)];
                 case 8:
-                    bundledIndices = _b.sent();
+                    bundledIndices = _c.sent();
                     bundles = bundles.concat(bundledIndices);
-                    _b.label = 9;
+                    _c.label = 9;
                 case 9:
                     i++;
                     return [3 /*break*/, 2];
                 case 10: return [4 /*yield*/, Config_1.ArData.bundleData(bundles)];
                 case 11:
-                    data = _b.sent();
+                    data = _c.sent();
                     return [4 /*yield*/, Config_1.arweave.createTransaction({ data: JSON.stringify(data) }, key)];
                 case 12:
-                    tx = _b.sent();
+                    tx = _c.sent();
                     tx.addTag('Bundle-Type', 'ANS-102');
                     tx.addTag('Bundle-Format', 'json');
                     tx.addTag('Bundle-Version', '1.0.0');
                     tx.addTag('Content-Type', 'application/json');
                     return [4 /*yield*/, Config_1.arweave.transactions.sign(tx, key)];
                 case 13:
-                    _b.sent();
+                    _c.sent();
                     return [4 /*yield*/, Config_1.arweave.transactions.post(tx)];
                 case 14:
-                    _b.sent();
+                    _b = _c.sent(), status = _b.status, statusText = _b.statusText;
+                    Log_util_1.LogArweave(status, statusText);
                     Log_util_1.Log(("Transmitted Solana " + (type === 'index' ? 'Indexed Blocks' : 'Blocks') + " with the Slots " + transactions.map(function (t) { return t.tags.slot; }) + " to Arweave\n").green);
                     return [2 /*return*/, true];
             }

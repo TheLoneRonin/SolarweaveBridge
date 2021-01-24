@@ -28,6 +28,7 @@ export const SolarweaveConfig: SolarweaveInterface = {
     local: false,
     localFile: `solarweave.cache.json`,
     console: true,
+    debug: false,
     compressed: true,
     parallelize: 1,
     batch: 1,
@@ -47,6 +48,7 @@ export function UpdateConfig(
     local: boolean,
     localFile: string,
     console: boolean,
+    debug: boolean,
     compressed: boolean,
     parallelize: number,
     batch: number,
@@ -64,6 +66,7 @@ export function UpdateConfig(
     SolarweaveConfig.local = local;
     SolarweaveConfig.localFile = localFile;
     SolarweaveConfig.console = console;
+    SolarweaveConfig.debug = debug;
     SolarweaveConfig.compressed = compressed;
     SolarweaveConfig.parallelize = parallelize;
     SolarweaveConfig.batch = batch;

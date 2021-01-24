@@ -54,6 +54,7 @@ Options:
   --local                    cache locally to a JSON file instead of to Arweave (default: false)
   --localFile [file path]    if caching data locally, specify the file path (default: "solarweave.cache.json")
   --console                  do not output log data to console (default: false)
+  --debug                    show more verbose debug logs in the console (default: false)
   --uncompressed             store blocks in an uncompressed format (default: false)
   --parallelize [blocks]     the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time (default: "1")
   --batch [number]           the number of requests to batch per Arweave transaction (default: "1")
@@ -72,6 +73,7 @@ Commands:
   index                      index an existing database with their Account Keys and Signatures
   version                    Get the current version of Solarweave
   help [command]             display help for command
+
 ```
 
 #### Setting credentials
@@ -171,6 +173,15 @@ You can turn off console out put by passing the `console` flag.
 ```bash
 $ solarweave --console
 ```
+
+#### Debug output
+
+You can debug Solana RPC request and responses and Arweave requests and response with the `debug` flag.
+
+```bash
+$ solarweave --debug
+```
+
 
 #### Compression
 

@@ -23,6 +23,7 @@ Solarweave
     .option('--local', 'cache locally to a JSON file instead of to Arweave', false)
     .option('--localFile [file path]', 'if caching data locally, specify the file path', 'solarweave.cache.json')
     .option('--console', 'do not output log data to console', false)
+    .option('--debug', 'show more verbose debug logs in the console', false)
     .option('--uncompressed', 'store blocks in an uncompressed format', false)
     .option('--parallelize [blocks]', 'the amount of blocks to process at a time, 1 processes 1 block at a time, 8, 8 blocks at a time', '1')
     .option('--batch [number]', 'the number of requests to batch per Arweave transaction', '1')
@@ -77,7 +78,7 @@ Solarweave
     .command('version')
     .description('Get the current version of Solarweave')
     .action(() => {
-        console.log(`Solarweave v2.1.2`.green.bold);
+        console.log(`Solarweave v2.2.0`.green.bold);
     });
 
 Solarweave.parse(process.argv);

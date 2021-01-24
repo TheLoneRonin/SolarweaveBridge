@@ -15,6 +15,7 @@ describe('Config Tests', () => {
         equal(SolarweaveConfig.local, false);
         equal(SolarweaveConfig.localFile, 'solarweave.cache.json');
         equal(SolarweaveConfig.console, true);
+        equal(SolarweaveConfig.debug, false);
         equal(SolarweaveConfig.compressed, true);
         equal(SolarweaveConfig.parallelize, 1);
         equal(SolarweaveConfig.benchmark, false);
@@ -32,6 +33,7 @@ describe('Config Tests', () => {
             false,
             'solarweave.cache.json',
             true,
+            false,
             true,
             1,
             1,

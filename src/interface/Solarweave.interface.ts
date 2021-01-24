@@ -7,6 +7,7 @@ export interface SolarweaveInterface {
     local: boolean;
     localFile: string;
     console: boolean;
+    debug: boolean;
     compressed: boolean;
     parallelize: number;
     batch: number;

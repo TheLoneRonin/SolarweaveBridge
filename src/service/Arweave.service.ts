@@ -1,8 +1,6 @@
-import Transaction from 'arweave/node/lib/transaction';
 import { read } from 'fs-jetpack';
-
 import { SolarweaveConfig, arweave, ArData } from '../Config';
-import { Log } from '../util/Log.util';
+import { Log, LogArweave } from '../util/Log.util';
 import { ArweaveTransaction } from '../interface/Arweave.interface';
 import { CompressBlock } from '../service/Compression.service';
 
@@ -49,7 +47,8 @@ export async function SubmitBlocksToArweave(transactions: ArweaveTransaction[], 
     tx.addTag('Content-Type', 'application/json');
 
     await arweave.transactions.sign(tx, key);
-    await arweave.transactions.post(tx);
+    const { status, statusText } = await arweave.transactions.post(tx);
+    LogArweave(status, statusText);
 
     Log(`Transmitted Solana ${type === 'index' ? 'Indexed Blocks' : 'Blocks'} with the Slots ${transactions.map(t => t.tags.slot)} to Arweave\n`.green);
     return true;

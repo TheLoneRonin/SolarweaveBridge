@@ -1,7 +1,7 @@
 import { UpdateConfig } from '../Config';
 
 export function ProcessCommand(Solarweave) {
-    const { database, gql, url, credentials, local, localFile, console, uncompressed, parallelize, batch, benchmark, noverify, index, start, end } = Solarweave;
+    const { database, gql, url, credentials, local, localFile, console, debug, uncompressed, parallelize, batch, benchmark, noverify, index, start, end } = Solarweave;
     UpdateConfig(
         `2.0`,
         database,
@@ -11,6 +11,7 @@ export function ProcessCommand(Solarweave) {
         local,
         localFile,
         console ? false : true,
+        debug,
         uncompressed ? false : true,
         Number(parallelize),
         Number(batch),
